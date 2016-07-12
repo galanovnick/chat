@@ -8,9 +8,12 @@ var ChatApp = function(rootId) {
 
 	var components = [];
 
-	var usersEventBus = EventBus();
+	var usersEventBus;
 
 	var _init = function() {
+
+		usersEventBus = EventBus();
+
 		console.log("root initialized");
 
 		components["usersContainer"] = UsersContainer();
@@ -29,7 +32,7 @@ var ChatApp = function(rootId) {
 		}
 
 		var _registrationFailed = function(message) {
-			
+
 		}
 
 		return {
@@ -49,22 +52,26 @@ var ChatApp = function(rootId) {
 		}
 	}
 
-	var UsersContainer = function() {
-		var storage = [];
-
-		var _add = function(user) {
-			
-		}
-
-		var _getAll = function() {
-
-		}
-
-		return {
-			"add": _add,
-			"getAll": _getAll
-		}
-	}
+	module.exports.UsersContainer = UsersContainer;
 
 	return {"init" : _init};
 }
+
+var UsersContainer = function() {
+	var storage = [];
+
+	var _add = function(user) {
+		
+	}
+
+	var _getAll = function() {
+
+	}
+
+	return {
+		"add": _add,
+		"getAll": _getAll
+	}
+}
+
+module.exports.UsersContainer = UsersContainer;
