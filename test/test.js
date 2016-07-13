@@ -1,14 +1,22 @@
-var usersContainer = require('../chat-app.js');
-console.log(usersContainer);
-var container = usersContainer.UsersContainer();
+var chatApp = require('../chat-app');
+
+var eventBus = require('../eventBus');
+
+var usersContainer = require('../usersContainer');
+
+var eb = eventBus.EventBus(function(callback) {return function(eventData) {callback(eventData)}});
+
+var usersStorage = usersContainer.UsersContainer([]);
+
+var chat = chatApp.ChatApp("chat-container", eb, usersStorage);
 
 var firstUser = {username: "vasya", password: "qwerty"};
 var secondUser = {username: "petya", password: "123456"};
 
-container.add(firstUser);
-container.add(secondUser);
+eb.post(firstUser, 0);
+eb.post(secondUser, 0);
 
-var allusers = container.getAll();
+var allusers = usersStorage.getAll();
 
 describe("test-suite", function() {
 

@@ -3,10 +3,14 @@
 <head>
 	<title>Chat room</title>
 	<script type="text/javascript" src="eventBus.js"></script>
+	<script type="text/javascript" src="usersContainer.js"></script>
 	<script type="text/javascript" src="chat-app.js"></script>
 	<script type="text/javascript">
 		window.onload = function() {
-			var chat = ChatApp("chat-container").init();
+			var chat = ChatApp("chat-container",
+				EventBus(function(callback) {return function(eventData) {callback(eventData)}}),
+				UsersContainer(JSON.parse(localStorage.getItem("users"))))
+					.init();
 		}
 	</script>
 </head>

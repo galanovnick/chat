@@ -1,4 +1,4 @@
-var ChatApp = function(rootId) {
+var ChatApp = function(rootId, eventBus, usersContainer) {
 
 	var events = {
 		userAddedEvent : 0,
@@ -8,31 +8,22 @@ var ChatApp = function(rootId) {
 
 	var _components = {};
 
-	var _usersContainer;
+	var _usersContainer = usersContainer;
 
-	var _usersEventBus;
+	var _usersEventBus = eventBus;
 
 	var _init = function() {
-		_usersEventBus = EventBus(function(callback) {
-			return function(eventData) {
-				callback(eventData);
-			}
-		});
-
-		_usersContainer = UsersContainer(localStorage.usersStorage ? JSON.parse(localStorage.usersStorage) : []);
-
-		_components["registration"] = RegistrationComponent("reg_" + rootId);
-		_components["usersList"] = UsersListComponent("u_list_" + rootId);
 
 		Object.keys(_components).forEach(function(key) {
 			_components[key].init();
 		});
 
-		_usersEventBus.subscribe(events.userAddedEvent, _usersContainer.add);
-		_usersEventBus.subscribe(events.usersListUpdatedEvent, _components["usersList"].render);
-		_usersEventBus.subscribe(events.registrationFailedEvent, _components["registration"].registrationFailed);
-
 		document.getElementById("register").onclick = function() {
+
+			var errorElem = document.getElementById("reg_error");
+			if (errorElem !== null) {
+				errorElem.innerHTML = "";
+			}
 
 			var username = document.getElementById("username").value;
 			var password = document.getElementById("password").value;
@@ -56,7 +47,7 @@ var ChatApp = function(rootId) {
 		}
 
 		window.onbeforeunload = function() {
-			localStorage.usersStorage = JSON.stringify(_usersContainer.getAll());
+			localStorage.setItem("users", JSON.stringify(_usersContainer.getAll()));
 		}
 	}
 
@@ -69,8 +60,9 @@ var ChatApp = function(rootId) {
 
 			var componentDiv = document.createElement('div');
 			componentDiv.id = _componentRootId;
-			componentDiv.style = 'width: 200px; height: 185px; padding:20px; margin:10px; border: 2px solid black; border-radius: 10px;';
-			componentDiv.innerHTML = '<div style=padding:10px><input type="text" id="username" placeholder="Username"/></div>' +
+			componentDiv.style = 'width: 200px; height: 205px; padding:20px; margin:10px; border: 2px solid black; border-radius: 10px;';
+			componentDiv.innerHTML = '<div style=padding:10px>Registration</div>' +
+				'<div style=padding:10px><input type="text" id="username" placeholder="Username"/></div>' +
 				'<div style=padding:10px><input type="password" id="password" placeholder="Password"/></div>' +
 				'<div style=padding:10px><input type="password" id="password_r" placeholder="Repeate password"/></div>' +
 				'<div style=padding:10px><input type="button" id="register" value="Register"/></div>';
@@ -80,9 +72,12 @@ var ChatApp = function(rootId) {
 
 		var _register = function(user) {
 			if (user.username in _usersContainer.getAll()) {
-				_usersEventBus.post("User with such name already exist.", events.registrationFailedEvent);
+				_usersEventBus.post("User already exist.", events.registrationFailedEvent);
 			} else {
 				_usersEventBus.post(user, events.userAddedEvent);
+				setTimeout(function() {
+					_usersEventBus.post(_usersContainer.getAll(), events.usersListUpdatedEvent);
+				}, 500);
 			}
 		}
 
@@ -98,10 +93,6 @@ var ChatApp = function(rootId) {
 			} else {
 				errorComponent.innerHTML = message;
 			}
-
-			setTimeout(function() {
-				errorComponent.innerHTML = "";
-			}, 1000);
 		}
 
 		return {
@@ -125,6 +116,7 @@ var ChatApp = function(rootId) {
 			componentDiv.innerHTML = '<div style=padding:10px>Registered users:</div><div id="users"></div>';
 
 			root.appendChild(componentDiv);
+			_render(_usersContainer.getAll());
 		}
 
 		var _render = function(users) {
@@ -144,27 +136,20 @@ var ChatApp = function(rootId) {
 			"init": _init,
 			"render": _render
 		}
-	}	
-
-	var UsersContainer = function(usersStorage) {
-		var storage = usersStorage;
-		console.log(storage);
-
-		var _add = function(user) {
-			storage[user.username] = user.password;
-			_usersEventBus.post(_getAll(), events.usersListUpdatedEvent);
-		}
-
-		var _getAll = function() {
-			return storage;
-		}
-
-		return {
-			"add": _add,
-			"getAll": _getAll
-		}
 	}
+
+	var subscribeComponents = function() {
+		_components["registration"] = RegistrationComponent("reg_" + rootId);
+		_components["usersList"] = UsersListComponent("u_list_" + rootId);
+
+		_usersEventBus.subscribe(events.userAddedEvent, _usersContainer.add);
+		_usersEventBus.subscribe(events.usersListUpdatedEvent, _components["usersList"].render);
+		_usersEventBus.subscribe(events.registrationFailedEvent, _components["registration"].registrationFailed);
+	}()
+
 	return {"init" : _init};
 }
 
-//module.exports.UsersContainer = UsersContainer;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports.ChatApp = ChatApp;
+}

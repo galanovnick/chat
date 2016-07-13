@@ -37,4 +37,6 @@ var EventBus = function(createSubscriber) {
 	}
 };
 
-//module.exports.EventBus = EventBus;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports.EventBus = EventBus;
+}
