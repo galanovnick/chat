@@ -1,41 +1,34 @@
-var EventBus = function() {
+var EventBus = function(createSubscriber) {
 
-	var _workers = [];
+	var _subscribers = new Array();
 
 	var _post = function(eventData, eventType) {
-		if (eventType != undefined && !(eventType in _workers)) {
+		if (eventType != undefined && !(eventType in _subscribers)) {
 			return;
 		}
 
 		if (eventType != undefined) {
+			for (var i = 0; i < _subscribers[eventType].length; i++) {
 
-			for (var i = 0; i < _workers[eventType].length; i++) {
-
-				_workers[eventType][i].postMessage(eventData);
+				_subscribers[eventType][i](eventData);
 
 			}
 		} else {
-			Object.keys(_workers).forEach(function(eventTypeKey, index) {
+			Object.keys(_subscribers).forEach(function(eventTypeKey, index) {
 
-				for (var i = 0; i < _workers[eventTypeKey].length; i++) {
-					
-					_workers[eventTypeKey][i].postMessage(eventData);
-
+				for (var i = 0; i < _subscribers[eventTypeKey].length; i++) {
+					_subscribers[eventTypeKey][i](eventData);
 				}
+
 			});
 		}
 	};
 
 	var _subscribe = function(eventType, callback) {
-		if (typeof _workers[eventType] === 'undefined') {
-			_workers[eventType] = [];
+		if (typeof _subscribers[eventType] === 'undefined') {
+			_subscribers[eventType] = new Array();
 		}
-
-		_workers[eventType].push(new Worker(
-				window.URL.createObjectURL(
-					new Blob(["onmessage = function(ev) {" + "(" + callback.toString() + ")(ev.data)};"]))
-			)
-		);
+		_subscribers[eventType].push(createSubscriber(callback));
 	};
 
 	return {
@@ -43,3 +36,5 @@ var EventBus = function() {
 		"subscribe": _subscribe
 	}
 };
+
+//module.exports.EventBus = EventBus;

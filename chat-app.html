@@ -5,11 +5,13 @@
 	<script type="text/javascript" src="eventBus.js"></script>
 	<script type="text/javascript" src="chat-app.js"></script>
 	<script type="text/javascript">
-		var chat = ChatApp("chat-container").init();
+		window.onload = function() {
+			var chat = ChatApp("chat-container").init();
+		}
 	</script>
 </head>
 <body>
-	<div id="chat-container">
+	<div id="chat-container" align="center">
 	</div>
 </body>
 </html>
