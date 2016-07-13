@@ -1,62 +1,24 @@
-var ChatApp = function(rootId, eventBus, usersContainer) {
+var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 	var events = {
-		userAddedEvent : 0,
-		usersListUpdatedEvent: 1,
-		registrationFailedEvent : 2
+		userAddedEvent : "USER_ADDED_EVENT",
+		userListUpdatedEvent: "USER_LIST_UPDATED_EVENT",
+		registrationFailedEvent : "REGISTRATION_FAILED_EVENT"
 	}
 
 	var _components = {};
-
-	var _usersContainer = usersContainer;
-
-	var _usersEventBus = eventBus;
 
 	var _init = function() {
 
 		Object.keys(_components).forEach(function(key) {
 			_components[key].init();
 		});
-
-		document.getElementById("register").onclick = function() {
-
-			var errorElem = document.getElementById("reg_error");
-			if (errorElem !== null) {
-				errorElem.innerHTML = "";
-			}
-
-			var username = document.getElementById("username").value;
-			var password = document.getElementById("password").value;
-			var password_r = document.getElementById("password_r").value;
-
-			if (username === "" || password === "") {
-				_usersEventBus.post("Fields cannot be empty.", events.registrationFailedEvent);
-				return;
-			}
-
-			if (password !== password_r) {
-				_usersEventBus.post("Passwords do not match.", events.registrationFailedEvent);
-				return;
-			}
-
-			user = {
-				username: username,
-				password: password,
-			}
-			_components["registration"].register(user);
-		}
-
-		window.onbeforeunload = function() {
-			localStorage.setItem("users", JSON.stringify(_usersContainer.getAll()));
-		}
 	}
 
-	var RegistrationComponent = function(registrationComponentRootId) {
-
-		var _componentRootId = registrationComponentRootId;
+	var RegistrationComponent = function(_componentRootId) {
 
 		var _init = function() {
-			var root = document.getElementById(rootId);
+			var root = document.getElementById(_rootId);
 
 			var componentDiv = document.createElement('div');
 			componentDiv.id = _componentRootId;
@@ -68,17 +30,25 @@ var ChatApp = function(rootId, eventBus, usersContainer) {
 				'<div style=padding:10px><input type="button" id="register" value="Register"/></div>';
 
 			root.appendChild(componentDiv);
+
+			document.getElementById("register").onclick = function() {
+
+				var errorElem = document.getElementById("reg_error");
+				if (errorElem !== null) {
+					errorElem.innerHTML = "";
+				}
+				var username = document.getElementById("username").value;
+				var password = document.getElementById("password").value;
+				var password_r = document.getElementById("password_r").value;
+
+				_register(User(username, password, password_r));				
+			}
 		}
 
 		var _register = function(user) {
-			if (user.username in _usersContainer.getAll()) {
-				_usersEventBus.post("User already exist.", events.registrationFailedEvent);
-			} else {
-				_usersEventBus.post(user, events.userAddedEvent);
-				setTimeout(function() {
-					_usersEventBus.post(_usersContainer.getAll(), events.usersListUpdatedEvent);
-				}, 250);
-			}
+			console.log("Trying to post 'userAddedEvent' (user = " + user.username + ")...")
+			_userEventBus.post(user, events.userAddedEvent);
+
 		}
 
 		var _registrationFailed = function(message) {
@@ -89,6 +59,7 @@ var ChatApp = function(rootId, eventBus, usersContainer) {
 
 				var errorComponent = document.createElement('div');
 				errorComponent.innerHTML = '<font id = "reg_error" color="red" style=padding:10px;>' + message + '</font>';
+
 				componentRootElem.appendChild(errorComponent);
 			} else {
 				errorComponent.innerHTML = message;
@@ -102,12 +73,10 @@ var ChatApp = function(rootId, eventBus, usersContainer) {
 		}
 	}
 
-	var UsersListComponent = function(usersListComponentRootId) {
-
-		var _componentRootId = usersListComponentRootId;
+	var UserListComponent = function(_componentRootId) {
 
 		var _init = function() {
-			var root = document.getElementById(rootId);
+			var root = document.getElementById(_rootId);
 
 			var componentDiv = document.createElement('div');
 
@@ -116,7 +85,8 @@ var ChatApp = function(rootId, eventBus, usersContainer) {
 			componentDiv.innerHTML = '<div style=padding:10px>Registered users:</div><div id="users"></div>';
 
 			root.appendChild(componentDiv);
-			_render(_usersContainer.getAll());
+
+			_render(_userService.getAll());
 		}
 
 		var _render = function(users) {
@@ -138,14 +108,24 @@ var ChatApp = function(rootId, eventBus, usersContainer) {
 		}
 	}
 
-	var subscribeComponents = function() {
-		_components["registration"] = RegistrationComponent("reg_" + rootId);
-		_components["usersList"] = UsersListComponent("u_list_" + rootId);
+	var User = function(username, password, password_r) {
+		return {
+			"username": username,
+			"password": password,
+			"password_r": password_r
+		}
+	}
 
-		_usersEventBus.subscribe(events.userAddedEvent, _usersContainer.add);
-		_usersEventBus.subscribe(events.usersListUpdatedEvent, _components["usersList"].render);
-		_usersEventBus.subscribe(events.registrationFailedEvent, _components["registration"].registrationFailed);
-	}()
+	var createComponents = function() {
+		console.log("Creating components...");
+
+		_components["registration"] = RegistrationComponent("reg_" + _rootId);
+		_components["userList"] = UserListComponent("u_list_" + _rootId);
+
+		_userEventBus.subscribe(events.userAddedEvent, _userService.create);
+		_userEventBus.subscribe(events.userListUpdatedEvent, _components["userList"].render);
+		_userEventBus.subscribe(events.registrationFailedEvent, _components["registration"].registrationFailed);
+	}();
 
 	return {"init" : _init};
 }

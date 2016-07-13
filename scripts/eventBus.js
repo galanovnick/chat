@@ -3,6 +3,7 @@ var EventBus = function(createSubscriber) {
 	var _subscribers = new Array();
 
 	var _post = function(eventData, eventType) {
+
 		if (eventType != undefined && !(eventType in _subscribers)) {
 			return;
 		}
