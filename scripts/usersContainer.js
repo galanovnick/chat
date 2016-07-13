@@ -24,6 +24,10 @@ var UsersContainer = function(usersStorage) {
 	}
 }
 
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports.UsersContainer = UsersContainer;
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module);
 }
+
+define(function() {
+	return UsersContainer;
+});

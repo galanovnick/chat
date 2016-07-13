@@ -77,7 +77,7 @@ var ChatApp = function(rootId, eventBus, usersContainer) {
 				_usersEventBus.post(user, events.userAddedEvent);
 				setTimeout(function() {
 					_usersEventBus.post(_usersContainer.getAll(), events.usersListUpdatedEvent);
-				}, 500);
+				}, 250);
 			}
 		}
 
@@ -150,6 +150,10 @@ var ChatApp = function(rootId, eventBus, usersContainer) {
 	return {"init" : _init};
 }
 
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports.ChatApp = ChatApp;
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module);
 }
+
+define(function() {
+	return ChatApp;
+});

@@ -2,17 +2,19 @@
 <html>
 <head>
 	<title>Chat room</title>
-	<script type="text/javascript" src="eventBus.js"></script>
-	<script type="text/javascript" src="usersContainer.js"></script>
-	<script type="text/javascript" src="chat-app.js"></script>
-	<script type="text/javascript">
+	<!--<script type="text/javascript" src="scripts/eventBus.js"></script>
+	<script type="text/javascript" src="scripts/usersContainer.js"></script>
+	<script type="text/javascript" src="scripts/chat-app.js"></script> -->
+	<script data-main="scripts/app" src="scripts/require.js"></script>
+
+	<!--<script type="text/javascript">
 		window.onload = function() {
 			var chat = ChatApp("chat-container",
 				EventBus(function(callback) {return function(eventData) {callback(eventData)}}),
 				UsersContainer(JSON.parse(localStorage.getItem("users"))))
 					.init();
 		}
-	</script>
+	</script>-->
 </head>
 <body>
 	<div id="chat-container" align="center">

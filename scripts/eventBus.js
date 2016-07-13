@@ -37,6 +37,10 @@ var EventBus = function(createSubscriber) {
 	}
 };
 
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports.EventBus = EventBus;
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module);
 }
+
+define(function() {
+	return EventBus;
+});
