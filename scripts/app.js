@@ -7,16 +7,18 @@ requirejs.config({
 
 define(function(require) {
 
-	var ChatApp = require('./chat');
-	var EventBus = require('./lib/eventBus');
-	var UsersContainer = require('./userContainer');
+	require("./userDto");
+	require("./userStorage");
+	require('./chat');
+	require('./lib/eventBus');
+	require('./userService');
 
 	var eb = EventBus();
 
 	var chat = ChatApp(
 			"chat-container",
 			eb,
-			UsersContainer("users", eb)
+			UserService(eb, UserStorage())
 		).init();
 
 });		

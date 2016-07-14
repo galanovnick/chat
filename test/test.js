@@ -1,28 +1,32 @@
-var UserContainer = require('../scripts/userContainer');
+require("../scripts/userStorage");
+
+var UserStorage = require('../scripts/userStorage');
+var UserService = require('../scripts/userService');
+var UserDto = require('../scripts/userDto');
 
 var fakeEventBusImpl = {
 	"post": function(){},
 	"subscribe": function(){}
 };
 
-var userContainer = UserContainer("users", fakeEventBusImpl);
+var userService = UserService(fakeEventBusImpl, UserStorage());
 
-var firstUser = {username: "vasya", password: "qwerty", password_r: "qwerty"};
-var secondUser = {username: "petya", password: "123456", password_r: "123456"};
-var duplicatedFirstUser = {username: "vasya", password: "555", password_r: "555"};
-var userWithDifferentPasswords = {username: "masha", password: "123", password_r: "132"};
-var userWithEmptyFields = {username: "", password: "", password_r: ""};
+var firstUser = UserDto("vasya", "qwerty", "qwerty");
+var secondUser = UserDto("petya", "123456", "123456");
+var duplicatedFirstUser = UserDto("vasya", "555", "555");
+var userWithDifferentPasswords = UserDto("masha", "123", "132");
+var userWithEmptyFields = UserDto("", "", "");
 
-userContainer.create(firstUser);
-userContainer.create(secondUser);
+userService.create(firstUser);
+userService.create(secondUser);
 
-userContainer.create(duplicatedFirstUser);
+userService.create(duplicatedFirstUser);
 
-userContainer.create(userWithDifferentPasswords);
+userService.create(userWithDifferentPasswords);
 
-userContainer.create(userWithEmptyFields);
+userService.create(userWithEmptyFields);
 
-var allusers = userContainer.getAll();
+var allusers = userService.getAll();
 
 describe("test-suite", function() {
 

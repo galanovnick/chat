@@ -6,11 +6,13 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 		registrationFailedEvent : "REGISTRATION_FAILED_EVENT"
 	}
 
+	var _userContext /*= {username: "Vasya"}*/;
+
 	var _components = {};
 
 	var _init = function() {
 
-		_components.registration = RegistrationComponent("reg_" + _rootId);
+		_components.registration = RegistrationComponent("reg-" + _rootId);
 		_components.userList = UserListComponent("u_list_" + _rootId);
 
 		_userEventBus.subscribe(events.userAddedEvent, _userService.create);
@@ -22,6 +24,22 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 			_components[key].init();
 		});
+
+		if (typeof _userContext !== 'undefined') {
+			_components.registration.hide();
+
+			_components.main = MainWindowComponent("main-" + _rootId);
+
+			_components.main.init();
+		}
+	}
+
+	var _createChatRoom = function(_chatRoom) {
+		if (typeof _components.rooms === 'undefined') {
+			_components.rooms = [];
+		}
+
+		_components.rooms.push(_chatRoom);
 	}
 
 	var RegistrationComponent = function(_componentRootId) {
@@ -31,7 +49,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 			var componentDiv = document.createElement('div');
 			componentDiv.id = _componentRootId;
-			componentDiv.style = 'width: 200px; height: 205px; padding:20px; margin:10px; border: 2px solid black; border-radius: 10px;';
+			componentDiv.style = 'margin: auto; width: 200px; height: 205px; padding:20px; border: 2px solid black; border-radius: 10px;';
 			componentDiv.innerHTML = '<div style=padding:10px>Registration</div>' +
 				'<div style=padding:10px><input type="text" id="username" placeholder="Username"/></div>' +
 				'<div style=padding:10px><input type="password" id="password" placeholder="Password"/></div>' +
@@ -45,7 +63,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 				var password = document.getElementById("password").value;
 				var password_r = document.getElementById("password_r").value;
 
-				_register(User(username, password, password_r));				
+				_register(UserDto(username, password, password_r));				
 			}
 		}
 
@@ -81,8 +99,13 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			document.getElementById("password_r").value = "";
 		}
 
+		var _hide = function() {
+			document.getElementById(_componentRootId).remove();
+		}
+
 		return {
 			"init": _init,
+			"hide": _hide,
 			"register": _register,
 			"registrationFailed": _registrationFailed,
 			"resetFields": _resetFields
@@ -97,7 +120,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			var componentDiv = document.createElement('div');
 
 			componentDiv.id = _componentRootId;
-			componentDiv.style = 'width: 200px; height: 200px; padding:20px; margin:10px; border: 2px solid black; border-radius: 10px;';
+			componentDiv.style = 'width: 200px; height: 200px; padding:20px; margin-left: auto; margin-right: auto; margin-top: 20px; border: 2px solid black; border-radius: 10px;';
 			componentDiv.innerHTML = '<div style=padding:10px>Registered users:</div><div id="users"></div>';
 
 			root.appendChild(componentDiv);
@@ -124,11 +147,32 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 		}
 	}
 
-	var User = function(username, password, password_r) {
+	var MainWindowComponent = function(_componentRootId) {
+
+		var _init = function() {
+			var root = document.getElementById(_rootId);
+
+			var componentDiv = document.createElement('div');
+
+			componentDiv.id = _componentRootId;
+			componentDiv.style = 'width: 128px; height: 83px; margin-right: auto;' +
+				' margin-top: 20px; border: 2px solid black; border-radius: 10px;';
+			componentDiv.innerHTML = '<input type="button" id="new-room" value="New chat" style="width: 110px; height: 25px; margin: 8px;"/>' +
+				'<input type="button" id="join-room" value="Join chat" style="width: 110px; height: 25px; margin: 8px;"/>';
+
+			root.appendChild(componentDiv);
+
+			document.getElementById("new-room").onclick = function() {
+				
+			};
+
+			document.getElementById("join-room").onclick = function() {
+				
+			}
+		}
+
 		return {
-			"username": username,
-			"password": password,
-			"password_r": password_r
+			"init": _init
 		}
 	}
 
