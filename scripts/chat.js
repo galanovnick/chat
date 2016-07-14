@@ -132,6 +132,60 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 		}
 	}
 
+	var ChatRoomComponent = function(_chatRoomId, _chatRoomEventBus, _ownerName) {
+
+		var members;
+
+		var _init = function() {
+			console.log("Trying to initialie chat room with id = '" + _chatRoomId + "' and owner = '" + _ownerName + "'...");
+
+			members = [_ownerName];
+		}
+
+		var _close = function() {
+			console.log("Trying to close chat room with id = '" + _chatRoomId + "'...");
+
+			document.getElementById(_chatRoomId).remove();
+			members = null;
+		}
+
+		var _invite = function(username) {
+			console.log("Trying to invite user with name = '" + username + "' to chat room with id = '" + _chatRoomId + "'...")
+
+			if (username in members) {
+				console.log("Failed user(username = '" + username + "') invitation, reason: user already in chat.");
+
+			} else {
+				console.log("User with name = '" + username + "' has been successfully invited in chat with id = '" + _chatRoomId + "'.");
+
+				members.push(username);
+			}
+		}
+
+		var _leave = function(username) {
+			if (!(username in members)) {
+				console.log("User with name = '" + username + "' cannot leave chat room(id = '" + _chatRoomId + "', reason: user not in this chat.");
+
+			} else {
+				members.forEach(function(elem, index) {
+					if (elem === username) {
+
+						members.splice(index, 1);
+
+						return;
+					}
+				});
+			}
+		}
+
+		return {
+			"init": _init,
+			"invite": _invite,
+			"leave": _leave,
+			"close": _close
+		}
+	}
+
 	return {"init" : _init};
 }
 
