@@ -1,5 +1,8 @@
-var UsersService = function(_usersKey, _userEventBus) {
+if (typeof localStorage === 'undefined') {
+	localStorage = {getItem: function(){return "{}";}, setItem: function(){}};
+}
 
+var UsersService = function(_usersKey, _userEventBus) {
 	var storage;
 
 	if (typeof localStorage.getItem(_usersKey) === 'undefined' || localStorage.getItem(_usersKey) === null) {

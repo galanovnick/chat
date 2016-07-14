@@ -1,21 +1,19 @@
-var ChatApp = require('../scripts/chat');
-var EventBus = require('../scripts/eventBus');
-var UsersContainer = require('../scripts/usersContainer');
+var UserContainer = require('../scripts/userContainer');
 
+var fakeEventBusImpl = {
+	"post": function(){},
+	"subscribe": function(){}
+};
 
-var eb = EventBus(function(callback) {return function(eventData) {callback(eventData)}});
+var userContainer = UserContainer("users", fakeEventBusImpl);
 
-var usersStorage = UsersContainer([]);
+var firstUser = {username: "vasya", password: "qwerty", password_r: "qwerty"};
+var secondUser = {username: "petya", password: "123456", password_r: "123456"};
 
-var chat = ChatApp("chat-container", eb, usersStorage);
+userContainer.create(firstUser);
+userContainer.create(secondUser);
 
-var firstUser = {username: "vasya", password: "qwerty"};
-var secondUser = {username: "petya", password: "123456"};
-
-eb.post(firstUser, 0); //0 - userAddedEvent
-eb.post(secondUser, 0);
-
-var allusers = usersStorage.getAll();
+var allusers = userContainer.getAll();
 
 describe("test-suite", function() {
 
@@ -23,14 +21,14 @@ describe("test-suite", function() {
 
 	it("Failed on return of users list.", function() {
 		test
-			.array(allusers)
+			.object(allusers)
 			.hasLength(2)
 		;
 	});
 
 	it("Failed user addition.", function() {
 		test
-			.array(allusers)
+			.object(allusers)
 				.hasProperty(firstUser.username, firstUser.password)
 				.hasProperty(secondUser.username, secondUser.password)
 		;

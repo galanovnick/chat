@@ -117,8 +117,6 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 	}
 
 	var createComponents = function() {
-		console.log("Creating components...");
-
 		_components["registration"] = RegistrationComponent("reg_" + _rootId);
 		_components["userList"] = UserListComponent("u_list_" + _rootId);
 
