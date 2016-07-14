@@ -24,7 +24,7 @@ var UserService = function(_userEventBus, _userStorage) {
 		} else {
 			console.log("User(" + user.username + ") created.")
 
-			_userStorage.add({username: user.username, password: user.password});
+			_userStorage.add({username: user.username, password: user.password}); //or DTO???
 
 			_userEventBus.post(_userStorage.getAll(), events.userListUpdatedEvent);
 		}

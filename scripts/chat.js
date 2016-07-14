@@ -6,7 +6,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 		registrationFailedEvent : "REGISTRATION_FAILED_EVENT"
 	}
 
-	var _userContext /*= {username: "Vasya"}*/;
+	var _userContext/* = {username: "Vasya"}*/;
 
 	var _components = {};
 
@@ -14,7 +14,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 		_components.registration = RegistrationComponent("reg-" + _rootId);
 		_components.userList = UserListComponent("u_list_" + _rootId);
-
+		//TODO: remove direct method calls. Add on{$EVENT_NAME} methods to all components.
 		_userEventBus.subscribe(events.userAddedEvent, _userService.create);
 		_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.render);
 		_userEventBus.subscribe(events.userListUpdatedEvent, _components.registration.resetFields);
@@ -45,23 +45,19 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 	var RegistrationComponent = function(_componentRootId) {
 
 		var _init = function() {
-			var root = document.getElementById(_rootId);
-
-			var componentDiv = document.createElement('div');
-			componentDiv.id = _componentRootId;
-			componentDiv.style = 'margin: auto; width: 200px; height: 205px; padding:20px; border: 2px solid black; border-radius: 10px;';
-			componentDiv.innerHTML = '<div style=padding:10px>Registration</div>' +
+			$('<div><div style="padding:10px;">Registration</div>' +
 				'<div style=padding:10px><input type="text" id="username" placeholder="Username"/></div>' +
 				'<div style=padding:10px><input type="password" id="password" placeholder="Password"/></div>' +
 				'<div style=padding:10px><input type="password" id="password_r" placeholder="Repeate password"/></div>' +
-				'<div style=padding:10px><input type="button" id="register" value="Register"/></div>';
-
-			root.appendChild(componentDiv);
+				'<div style=padding:10px><input type="button" id="register" value="Register"/></div></div>')
+				.appendTo("#" + _rootId)
+					.css({margin: 'auto', width: '200px', height: '205px', padding: '20px', border: '2px solid black', 'border-radius': '10px'})
+					.attr('id', _componentRootId);
 
 			document.getElementById("register").onclick = function() {
-				var username = document.getElementById("username").value;
-				var password = document.getElementById("password").value;
-				var password_r = document.getElementById("password_r").value;
+				var username = $("#username").val();
+				var password = $("#password").val();
+				var password_r = $("#password_r").val();
 
 				_register(UserDto(username, password, password_r));				
 			}
@@ -74,33 +70,27 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 		}
 
 		var _registrationFailed = function(message) {
-			var errorComponent = document.getElementById("reg_error");
-
-			if (errorComponent === null) {
-				var componentRootElem = document.getElementById(_componentRootId);
-
-				var errorComponent = document.createElement('div');
-				errorComponent.innerHTML = '<font id = "reg_error" color="red" style=padding:10px;>' + message + '</font>';
-
-				componentRootElem.appendChild(errorComponent);
+			if (!$("#reg_error").length) {
+				$('<font id = "reg_error" color="red" style=padding:10px;>' + message + '</font>')
+					.appendTo("#" + _componentRootId)
+					.attr('id', 'reg_error');
 			} else {
-				errorComponent.innerHTML = message;
+				$("#reg_error").html(message);
 			}
 		}
 
 		var _resetFields = function() {
-			var errorElem = document.getElementById("reg_error");
-			if (errorElem !== null) {
-				errorElem.innerHTML = "";
+			if ($("#reg_error").length) {
+				$("#reg_error").html("");
 			}
 
-			document.getElementById("username").value = "";
-			document.getElementById("password").value = "";
-			document.getElementById("password_r").value = "";
+			$("#username").val("");
+			$("#password").val("");
+			$("#password_r").val("");
 		}
 
 		var _hide = function() {
-			document.getElementById(_componentRootId).remove();
+			$("#" + _componentRootId).remove();
 		}
 
 		return {
@@ -115,29 +105,23 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 	var UserListComponent = function(_componentRootId) {
 
 		var _init = function() {
-			var root = document.getElementById(_rootId);
-
-			var componentDiv = document.createElement('div');
-
-			componentDiv.id = _componentRootId;
-			componentDiv.style = 'width: 200px; height: 200px; padding:20px; margin-left: auto; margin-right: auto; margin-top: 20px; border: 2px solid black; border-radius: 10px;';
-			componentDiv.innerHTML = '<div style=padding:10px>Registered users:</div><div id="users"></div>';
-
-			root.appendChild(componentDiv);
+			console.log(_rootId);
+			$('<div style=padding:10px>Registered users:<div id="users"></div></div>')
+				.appendTo("#" + _rootId)
+					.css({width: '200px', height: '200px', padding: '20px', 'margin-left': 'auto', 'margin-right': 'auto', 
+						'margin-top': '20px', 'border': '2px solid black', 'border-radius': '10px'})
+					.attr('id', _componentRootId);
 
 			_render(_userService.getAll());
 		}
 
 		var _render = function(users) {
-			var usersDiv = document.getElementById("users");
-			usersDiv.innerHTML = "";
+			$("#users").html("");
 
 			Object.keys(users).forEach(function(username) {
-				var userDiv = document.createElement('div');
-				userDiv.style = 'padding: 10px';
-				userDiv.innerHTML = 'Username: ' + username;
-
-				usersDiv.appendChild(userDiv);
+				$('<div> Username: ' + username + '</div>')
+					.appendTo("#users")
+						.css("padding", "10px");
 			});
 		}
 
@@ -150,25 +134,11 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 	var MainWindowComponent = function(_componentRootId) {
 
 		var _init = function() {
-			var root = document.getElementById(_rootId);
-
-			var componentDiv = document.createElement('div');
-
-			componentDiv.id = _componentRootId;
-			componentDiv.style = 'width: 128px; height: 83px; margin-right: auto;' +
-				' margin-top: 20px; border: 2px solid black; border-radius: 10px;';
-			componentDiv.innerHTML = '<input type="button" id="new-room" value="New chat" style="width: 110px; height: 25px; margin: 8px;"/>' +
-				'<input type="button" id="join-room" value="Join chat" style="width: 110px; height: 25px; margin: 8px;"/>';
-
-			root.appendChild(componentDiv);
-
-			document.getElementById("new-room").onclick = function() {
-				
-			};
-
-			document.getElementById("join-room").onclick = function() {
-				
-			}
+			$('<div><input type="button" id="new-room" value="New chat" style="width: 110px; height: 25px; margin: 8px;"/>' +
+				'<input type="button" id="join-room" value="Join chat" style="width: 110px; height: 25px; margin: 8px;"/></div>')
+				.appendTo("#" + _rootId)
+					.css({width: '128px', height: '83px', 'margin-right': 'auto', 'margin-top': '20px', border: '2px solid black', 'border-radius': '10px'})
+					.attr("id", _componentRootId);
 		}
 
 		return {
