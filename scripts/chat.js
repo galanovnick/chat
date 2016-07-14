@@ -10,7 +10,16 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 	var _init = function() {
 
+		_components.registration = RegistrationComponent("reg_" + _rootId);
+		_components.userList = UserListComponent("u_list_" + _rootId);
+
+		_userEventBus.subscribe(events.userAddedEvent, _userService.create);
+		_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.render);
+		_userEventBus.subscribe(events.userListUpdatedEvent, _components.registration.resetFields);
+		_userEventBus.subscribe(events.registrationFailedEvent, _components.registration.registrationFailed);
+
 		Object.keys(_components).forEach(function(key) {
+
 			_components[key].init();
 		});
 	}
@@ -66,7 +75,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			if (errorElem !== null) {
 				errorElem.innerHTML = "";
 			}
-			
+
 			document.getElementById("username").value = "";
 			document.getElementById("password").value = "";
 			document.getElementById("password_r").value = "";
@@ -122,16 +131,6 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			"password_r": password_r
 		}
 	}
-
-	var createComponents = function() {
-		_components["registration"] = RegistrationComponent("reg_" + _rootId);
-		_components["userList"] = UserListComponent("u_list_" + _rootId);
-
-		_userEventBus.subscribe(events.userAddedEvent, _userService.create);
-		_userEventBus.subscribe(events.userListUpdatedEvent, _components["userList"].render);
-		_userEventBus.subscribe(events.userListUpdatedEvent, _components["registration"].resetFields);
-		_userEventBus.subscribe(events.registrationFailedEvent, _components["registration"].registrationFailed);
-	}();
 
 	return {"init" : _init};
 }

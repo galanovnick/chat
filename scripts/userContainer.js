@@ -39,6 +39,7 @@ var UsersService = function(_usersKey, _userEventBus) {
 
 	var _getAll = function() {
 		console.log("Trying to provide user list(" + Object.keys(storage) + ")...");
+
 		return storage;
 	}
 

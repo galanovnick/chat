@@ -1,4 +1,23 @@
-var EventBus = function(createSubscriber) {
+var EventBus = function(webWorkersKey) {
+
+	var createSubscriber;
+
+	if (typeof webWorkersKey === 'boolean' && webWorkersKey) {
+		createSubscriber = function(callback) {
+			return function(eventData) {
+				new Worker(
+					window.URL.createObjectURL(
+						new Blob(["onmessage = function(ev) {" + "(" + callback.toString() + ")(ev.data)};"]))
+				).postMessage(eventData);
+			}
+		}
+	} else {
+		createSubscriber = function(callback) {
+			return function(eventData) {
+				callback(eventData);
+			}
+		}
+	}
 
 	var _subscribers = new Array();
 
