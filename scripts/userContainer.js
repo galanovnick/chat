@@ -17,15 +17,15 @@ var UsersService = function(_usersKey, _userEventBus) {
 		console.log("Trying to create user: " + user.username);
 
 		if (user.username === "" || user.password === "" || user.password_r === "") {
-			console.log("Failed creation of user " + user + ". Reason: empty input fields.");
+			console.log("Failed creation of user '" + user.username + "'. Reason: empty input fields.");
 
 			_userEventBus.post("Fields cannot be empty.", "REGISTRATION_FAILED_EVENT");
 		} else if(user.password !== user.password_r) {
-			console.log("Failed creation of user " + user + ". Reason: passwords do not match.");
+			console.log("Failed creation of user '" + user.username + "'. Reason: passwords do not match.");
 
 			_userEventBus.post("Passwords do not match.", "REGISTRATION_FAILED_EVENT");
 		} else if (typeof storage[user.username] !== 'undefined') {
-			console.log("Failed creation of user " + user + ". Reason: user already exists.");
+			console.log("Failed creation of user '" + user.username + "'. Reason: user already exists.");
 
 			_userEventBus.post("User already exists.", "REGISTRATION_FAILED_EVENT");
 		} else {
@@ -38,7 +38,7 @@ var UsersService = function(_usersKey, _userEventBus) {
 	}
 
 	var _getAll = function() {
-		console.log("Trying to provide users list(" + Object.keys(storage) + ")...");
+		console.log("Trying to provide user list(" + Object.keys(storage) + ")...");
 		return storage;
 	}
 

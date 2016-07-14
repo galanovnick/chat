@@ -1,7 +1,7 @@
 define(function(require) {
 	
 	var ChatApp = require('./chat');
-	var EventBus = require('./eventBus');
+	var EventBus = require('./lib/eventBus');
 	var UsersContainer = require('./userContainer');
 
 	var eb = EventBus(function(callback) {return function(eventData) {callback(eventData)}});

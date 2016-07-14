@@ -32,11 +32,6 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			root.appendChild(componentDiv);
 
 			document.getElementById("register").onclick = function() {
-
-				var errorElem = document.getElementById("reg_error");
-				if (errorElem !== null) {
-					errorElem.innerHTML = "";
-				}
 				var username = document.getElementById("username").value;
 				var password = document.getElementById("password").value;
 				var password_r = document.getElementById("password_r").value;
@@ -66,10 +61,22 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			}
 		}
 
+		var _resetFields = function() {
+			var errorElem = document.getElementById("reg_error");
+			if (errorElem !== null) {
+				errorElem.innerHTML = "";
+			}
+			
+			document.getElementById("username").value = "";
+			document.getElementById("password").value = "";
+			document.getElementById("password_r").value = "";
+		}
+
 		return {
 			"init": _init,
 			"register": _register,
-			"registrationFailed": _registrationFailed
+			"registrationFailed": _registrationFailed,
+			"resetFields": _resetFields
 		}
 	}
 
@@ -122,6 +129,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 		_userEventBus.subscribe(events.userAddedEvent, _userService.create);
 		_userEventBus.subscribe(events.userListUpdatedEvent, _components["userList"].render);
+		_userEventBus.subscribe(events.userListUpdatedEvent, _components["registration"].resetFields);
 		_userEventBus.subscribe(events.registrationFailedEvent, _components["registration"].registrationFailed);
 	}();
 
