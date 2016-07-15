@@ -181,13 +181,30 @@ var ChatApp = function(_rootId) {
 
 		_chatRoomComponents = {};
 
+		var _chatRoomDomContent;
+
 		var _init = function() {
 			console.log("Trying to initialie chat room with id = '" + _componentRootId + "' and owner = '" + _ownerName + "'...");
 
 			$('<div>' + _chatName + '<hr></div>')
 				.appendTo("#" + _rootId)
-					.css({width: '250px', height: '365px', padding: '10px', margin: 'auto', border: '2px solid black', 'border-radius': '10px'})
-					.attr('id', _componentRootId);
+					.css({width: '250px', height: '390px', padding: '10px', margin: 'auto', border: '2px solid black', 'border-radius': '10px'})
+					.attr('id', _componentRootId)
+						.append('<div class="chat-room-content"></div>');
+
+			$("<input/>")
+				.appendTo("#" + _componentRootId)
+					.attr('type', 'button')
+					.val('Invite')
+					.css({width: '60px', height: '30px', 'margin-top': '5px'});
+
+			$("<input/>")
+				.appendTo("#" + _componentRootId)
+					.attr('type', 'text')
+					.attr('placeholder', 'User nickname')
+					.css({width: '100px', height: '20px', 'margin': '5px'});
+
+			_chatRoomDomContent = $("#" + _componentRootId + " .chat-room-content");
 
 			members = [_ownerName];
 
@@ -208,35 +225,35 @@ var ChatApp = function(_rootId) {
 
 			var _init = function() {
 				$('<textarea></textarea>')
-					.appendTo("#" + _componentRootId)
+					.appendTo(_chatRoomDomContent)
 						.css({'margin-top': '5px', width: '245px', height: '40px'})
 						.attr('placeholder', 'Type message here')
 						.addClass('message-input-box');
 				$('<input/>')
-					.appendTo("#" + _componentRootId)
+					.appendTo(_chatRoomDomContent)
 						.css({width: '80px', height: '40px', display: 'inline'})
 						.attr('type', 'button')
 						.attr('value', 'Send')
 						.addClass('send-message-btn');
 				$('<div></div>')
-					.appendTo("#" + _componentRootId)
+					.appendTo(_chatRoomDomContent)
 						.css({display: 'inline', margin: '3px', color: 'red', 'font-size': '10pt'})
 						.addClass('error');
 
-				$("#" + _componentRootId + " .send-message-btn").click(function() {
-					var message = MessageDto(_userContext.username, $("#" + _componentRootId + " .message-input-box").val());
+				$(_chatRoomDomContent).children(".send-message-btn").click(function() {
+					var message = MessageDto(_userContext.username, $(_chatRoomDomContent).children(".message-input-box").val());
 
 					_chatRoomEventBus.post(message ,chatRoomEvents.messageAddedEvent);
 				});
 			}
 
 			var _onMessageSuccessfullyAdded = function() {
-				$("#" + _componentRootId + " .error").html("");
-				$("#" + _componentRootId + " .message-input-box").val("");
+				$(_chatRoomDomContent).children(".error").html("");
+				$(_chatRoomDomContent).children(".message-input-box").val("");
 			}
 
 			var _onMessageAdditionFailed = function(message) {
-				$("#" + _componentRootId + " .error").html(message);
+				$(_chatRoomDomContent).children(".error").html(message);
 			}
 			
 			return {
@@ -250,14 +267,14 @@ var ChatApp = function(_rootId) {
 
 			var _init = function() {
 				$('<div></div>')
-					.appendTo("#" + _componentRootId)
+					.appendTo(_chatRoomDomContent)
 						.css({'word-wrap': 'break-word', 'overflow-x': 'hidden', 'overflow-y': 'auto', 'padding-left': '10px',
 							'padding-right': '10px', width: '230px', height: '225px', border: '1px solid black', 'border-radius': '10px'})
 						.addClass('messages');
 			}
 
 			var _onMessageListUpdated = function(messages) {
-				var messageBox = $("#" + _componentRootId + " .messages");
+				var messageBox = $(_chatRoomDomContent).children(".messages");
 				messageBox.html("");
 				messages.forEach(function(message) {
 					$('<p>' + message.username + ': ' + message.text + '</p>')
