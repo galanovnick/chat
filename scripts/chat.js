@@ -5,7 +5,6 @@ var ChatApp = function(_rootId) {
 
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
-		userListUpdatedEvent: "USER_LIST_UPDATED_EVENT",
 		registrationFailedEvent : "REGISTRATION_FAILED_EVENT",
 		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
 	}
@@ -32,11 +31,12 @@ var ChatApp = function(_rootId) {
 		if (typeof _userContext !== 'undefined') {
 			_components.registration.hide();
 
-			_components.main = MainWindowComponent("main-" + _rootId);
+			_components.main = MenuComponent("main-" + _rootId);
 			_components.chatRooms = [];
-			_components.chatRooms.push("chat-room#1-" + _rootId, EventBus(), _userContext.username);
+			_components.chatRooms.push(ChatRoomComponent("chat-room№1", EventBus(), _userContext.username, "Some Chat"));
 
 			_components.main.init();
+			_components.chatRooms[0].init();
 		}
 	}
 
@@ -119,7 +119,6 @@ var ChatApp = function(_rootId) {
 	var UserListComponent = function(_componentRootId) {
 
 		var _init = function() {
-			console.log(_rootId);
 			$('<div style=padding:10px>Registered users:<div id="users"></div></div>')
 				.appendTo("#" + _rootId)
 					.css({width: '200px', height: '200px', padding: '20px', 'margin-left': 'auto', 'margin-right': 'auto', 
@@ -149,7 +148,7 @@ var ChatApp = function(_rootId) {
 		}
 	}
 
-	var MainWindowComponent = function(_componentRootId) {
+	var MenuComponent = function(_componentRootId) {
 
 		var _init = function() {
 			$('<div><input type="button" id="new-room" value="New chat" style="width: 110px; height: 25px; margin: 8px;"/>' +
@@ -164,64 +163,77 @@ var ChatApp = function(_rootId) {
 		}
 	}
 
-	var ChatRoomComponent = function(_chatRoomId, _chatRoomEventBus, _ownerName) {
+	var ChatRoomComponent = function(_componentRootId, _chatRoomEventBus, _ownerName, _chatName) {
+
+		var chatRoomEvents = {
+			messageAddedEvent: "MESSAGE_ADDED_EVENT",
+			messageSuccessfullyAddedEvent: "MESSAGE_SUCCESSFULLY_ADDED_EVENT",
+			messageAdditionFailedEvent: "MESSAGE_ADDITION_FAILED_EVENT",
+			messagesListUpdatedEvent: "MESSAGES_LIST_UPDATED_EVENT"
+		}
 
 		var members;
 
+		var _messageService = MessageService(_chatRoomEventBus, MessageStorage());
+
+		_subComponents = {};
+
 		var _init = function() {
-			console.log("Trying to initialie chat room with id = '" + _chatRoomId + "' and owner = '" + _ownerName + "'...");
+			console.log("Trying to initialie chat room with id = '" + _componentRootId + "' and owner = '" + _ownerName + "'...");
+
+			$('<div>' + _chatName + '<hr></div>')
+				.appendTo("#" + _rootId)
+					.css({width: '250px', height: '365px', padding: '10px', margin: 'auto', border: '2px solid black', 'border-radius': '10px'})
+					.attr('id', _componentRootId);
 
 			members = [_ownerName];
-		}
 
-		var _close = function() {
-			console.log("Trying to close chat room with id = '" + _chatRoomId + "'...");
+			_subComponents.messageList = MessageListComponent();
+			_subComponents.addMessage = AddMessageComponent();
 
-			$("#" + _chatRoomId).remove();
-			members = null;
-		}
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageAddedEvent, _messageService.onMessageAdded);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _subComponents.addMessage.onMessageSuccessfullyAdded);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageAdditionFailedEvent, _subComponents.addMessage.onMessageAdditionFailed);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _subComponents.messageList.onMessageListUpdated);
 
-		var _invite = function(username) {
-			console.log("Trying to invite user with name = '" + username + "' to chat room with id = '" + _chatRoomId + "'...")
-
-			if (username in members) {
-				console.log("Failed user(username = '" + username + "') invitation, reason: user already in chat.");
-
-			} else {
-				console.log("User with name = '" + username + "' has been successfully invited in chat with id = '" + _chatRoomId + "'.");
-
-				members.push(username);
-			}
-		}
-
-		var _leave = function(username) {
-			if (!(username in members)) {
-				console.log("User with name = '" + username + "' cannot leave chat room(id = '" + _chatRoomId + "', reason: user not in this chat.");
-
-			} else {
-				members.forEach(function(elem, index) {
-					if (elem === username) {
-
-						members.splice(index, 1);
-
-						return;
-					}
-				});
-			}
+			Object.keys(_subComponents).forEach(function(key) {
+				_subComponents[key].init();
+			});
 		}
 
 		var AddMessageComponent = function() {
 
 			var _init = function() {
+				$('<textarea></textarea>')
+					.appendTo("#" + _componentRootId)
+						.css({'margin-top': '5px', width: '245px', height: '40px'})
+						.attr('placeholder', 'Type message here')
+						.addClass('message-input-box');
+				$('<input/>')
+					.appendTo("#" + _componentRootId)
+						.css({width: '80px', height: '40px', display: 'inline'})
+						.attr('type', 'button')
+						.attr('value', 'Send')
+						.addClass('send-message-btn');
+				$('<div></div>')
+					.appendTo("#" + _componentRootId)
+						.css({display: 'inline', margin: '3px', color: 'red', 'font-size': '10pt'})
+						.addClass('error');
 
+				$("#" + _componentRootId + " .send-message-btn").click(function() {
+					var message = MessageDto(_userContext.username, $("#" + _componentRootId + " .message-input-box").val());
+
+					_chatRoomEventBus.post(message ,chatRoomEvents.messageAddedEvent);
+				});
 			}
 
 			var _onMessageSuccessfullyAdded = function() {
-
+				$("#" + _componentRootId + " .error").html("");
+				$("#" + _componentRootId + " .message-input-box").val("");
 			}
 
-			var _onMessageAdditionFailed = function() {
-
+			var _onMessageAdditionFailed = function(message) {
+				$("#" + _componentRootId + " .error").html(message);
 			}
 			
 			return {
@@ -231,14 +243,26 @@ var ChatApp = function(_rootId) {
 			}
 		}
 
-		var MessageListComponent = function(_componentRootId, _messageService) {
+		var MessageListComponent = function() {
 
 			var _init = function() {
-
+				$('<div></div>')
+					.appendTo("#" + _componentRootId)
+						.css({'word-wrap': 'break-word', 'overflow-x': 'hidden', 'overflow-y': 'auto', 'padding-left': '10px',
+							'padding-right': '10px', width: '230px', height: '225px', border: '1px solid black', 'border-radius': '10px'})
+						.addClass('messages');
 			}
 
 			var _onMessageListUpdated = function(messages) {
+				var messageBox = $("#" + _componentRootId + " .messages");
+				messageBox.html("");
+				messages.forEach(function(message) {
+					$('<p>' + message.username + ': ' + message.text + '</p>')
+						.appendTo(messageBox);
+				});
 
+				var scrollValue = messages.length * 37;
+				messageBox.scrollTop(scrollValue);
 			}
 
 			return {
@@ -248,10 +272,7 @@ var ChatApp = function(_rootId) {
 		}
 
 		return {
-			"init": _init,
-			"invite": _invite,
-			"leave": _leave,
-			"close": _close
+			"init": _init
 		}
 	}
 
