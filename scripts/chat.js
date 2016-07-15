@@ -1,3 +1,7 @@
+//TODO: remove services and storages from constructors.
+//TODO: registration -> login -> add_chat
+//TODO: move css to css files
+
 var ChatApp = function(_rootId) {
 
 	_userEventBus = EventBus();
@@ -9,17 +13,14 @@ var ChatApp = function(_rootId) {
 		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
 	}
 
-	var _userContext = {username: "User"};
-
 	var _components = {};
 
 	var _init = function() {
 
 		_components.registration = RegistrationComponent("reg-" + _rootId);
-		//_components.userList = UserListComponent("u_list_" + _rootId);
+		_components.login = UserLoginComponent("login-" + _rootId);
 
 		_userEventBus.subscribe(events.userAddedEvent, _userService.onUserAdded);
-		//_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.onUserListUpdated);
 		_userEventBus.subscribe(events.successfullRegistrationEvent, _components.registration.onRegistrationSuccess);
 		_userEventBus.subscribe(events.registrationFailedEvent, _components.registration.onRegistrationFailed);
 
@@ -51,19 +52,33 @@ var ChatApp = function(_rootId) {
 	var RegistrationComponent = function(_componentRootId) {
 
 		var _init = function() {
-			$('<div><div style="padding:10px;">Registration</div>' +
-				'<div style=padding:10px><input type="text" id="username" placeholder="Username"/></div>' +
-				'<div style=padding:10px><input type="password" id="password" placeholder="Password"/></div>' +
-				'<div style=padding:10px><input type="password" id="password_r" placeholder="Repeate password"/></div>' +
-				'<div style=padding:10px><input type="button" id="register" value="Register"/></div></div>')
+			$('<div>')
+				.html('Registration')
 				.appendTo("#" + _rootId)
 					.css({margin: 'auto', width: '200px', height: '205px', padding: '20px', border: '2px solid black', 'border-radius': '10px'})
-					.attr('id', _componentRootId);
+					.attr('id', _componentRootId)
+						.append($('<input/>')
+							.attr('type', 'text')
+							.attr('placeholder', 'Username')
+							.addClass('username'))
+						.append($('<input/>')
+							.attr('type', 'password')
+							.attr('placeholder', 'Password')
+							.addClass('password'))
+						.append($('<input/>')
+							.attr('type', 'password')
+							.attr('placeholder', 'Repeate password')
+							.addClass('password_r'))
+						.append($('<input/>')
+							.attr('type', 'button')
+							.val('Register')
+							.addClass('register'));
 
-			$("#register").click(function() {
-				var username = $("#username").val();
-				var password = $("#password").val();
-				var password_r = $("#password_r").val();
+
+			$("#" + _componentRootId + " .register").click(function() {
+				var username = $("#" + _componentRootId + " .username").val();
+				var password = $("#" + _componentRootId + " .password").val();
+				var password_r = $("#" + _componentRootId + " .password_r").val();
 
 				_register(UserDto(username, password, password_r));				
 			});
@@ -114,6 +129,49 @@ var ChatApp = function(_rootId) {
 			"onRegistrationSuccess": _onRegistrationSuccess,
 			"onRegistrationFailed": _onRegistrationFailed
 		}
+	}
+
+	var UserLoginComponent = function(_componentRootId) {
+
+		var _init = function() {
+			$('<div>')
+				.html('Login')
+				.appendTo("#" + _rootId)
+					.css({margin: 'auto', width: '200px', height: '205px', padding: '20px', border: '2px solid black', 'border-radius': '10px'})
+					.attr('id', _componentRootId)
+						.append($('<input/>')
+							.attr('type', 'text')
+							.attr('placeholder', 'Username')
+							.addClass('username'))
+						.append($('<input/>')
+							.attr('type', 'password')
+							.attr('placeholder', 'Password')
+							.addClass('password'))
+						.append($('<input/>')
+							.attr('type', 'button')
+							.val('Login')
+							.addClass('login'));
+
+
+			$("#" + _componentRootId + " .login").click(function() {
+				var username = $("#" + _componentRootId + " .username").val();
+				var password = $("#" + _componentRootId + " .password").val();
+
+				_login(username, password);				
+			});
+		}
+
+		var _login = function(username , password) {
+
+		}
+
+		return {
+			"init": _init
+		}
+	}
+
+	var SessionComponent = function() {
+		
 	}
 
 	var UserListComponent = function(_componentRootId) {
@@ -204,11 +262,11 @@ var ChatApp = function(_rootId) {
 
 			$('<div>' + _chatName + '<hr></div>')
 				.appendTo("#" + _rootId)
-					.css({width: '250px', height: '390px', padding: '10px', margin: 'auto', border: '2px solid black', 'border-radius': '10px'})
+					.css({width: '250px', height: '370px', padding: '10px', margin: 'auto', border: '2px solid black', 'border-radius': '10px'})
 					.attr('id', _componentRootId)
 						.append('<div class="chat-room-content"></div>');
 
-			$("<input/>")
+			/*$("<input/>")
 				.appendTo("#" + _componentRootId)
 					.attr('type', 'button')
 					.val('Invite')
@@ -218,19 +276,19 @@ var ChatApp = function(_rootId) {
 				.appendTo("#" + _componentRootId)
 					.attr('type', 'text')
 					.attr('placeholder', 'User nickname')
-					.css({width: '100px', height: '20px', 'margin': '5px'});
+					.css({width: '100px', height: '20px', 'margin': '5px'});*/
 
 			_chatRoomDomContent = $("#" + _componentRootId + " .chat-room-content");
 
 			members = [_ownerName];
 
-			_chatRoomComponents.messageList = MessageListComponent();
-			_chatRoomComponents.addMessage = AddMessageComponent();
+			_chatRoomComponents.messageListComponent = MessageListComponent();
+			_chatRoomComponents.addMessageComponent = AddMessageComponent();
 
 			_chatRoomEventBus.subscribe(chatRoomEvents.messageAddedEvent, _messageService.onMessageAdded);
-			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _chatRoomComponents.addMessage.onMessageSuccessfullyAdded);
-			_chatRoomEventBus.subscribe(chatRoomEvents.messageAdditionFailedEvent, _chatRoomComponents.addMessage.onMessageAdditionFailed);
-			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _chatRoomComponents.messageList.onMessageListUpdated);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _chatRoomComponents.addMessageComponent.onMessageSuccessfullyAdded);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageAdditionFailedEvent, _chatRoomComponents.addMessageComponent.onMessageAdditionFailed);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _chatRoomComponents.messageListComponent.onMessageListUpdated);
 
 			Object.keys(_chatRoomComponents).forEach(function(key) {
 				_chatRoomComponents[key].init();
@@ -242,7 +300,7 @@ var ChatApp = function(_rootId) {
 			var _init = function() {
 				$('<textarea></textarea>')
 					.appendTo(_chatRoomDomContent)
-						.css({'margin-top': '5px', width: '245px', height: '40px'})
+						.css({'margin-top': '5px', width: '245px', height: '40px', resize: 'none'})
 						.attr('placeholder', 'Type message here')
 						.addClass('message-input-box');
 				$('<input/>')
