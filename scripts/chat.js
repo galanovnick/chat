@@ -178,6 +178,43 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			}
 		}
 
+		var AddMessageComponent = function() {
+
+			var _init = function() {
+
+			}
+
+			var _onMessageSuccessfullyAdded = function() {
+
+			}
+
+			var _onMessageAdditionFailed = function() {
+
+			}
+			
+			return {
+				"init": _init,
+				"onMessageSuccessfullyAdded": _onMessageSuccessfullyAdded,
+				"onMessageAdditionFailed": _onMessageAdditionFailed
+			}
+		}
+
+		var MessageListComponent = function(_componentRootId, _messageService) {
+
+			var _init = function() {
+
+			}
+
+			var _onMessageListUpdated = function(messages) {
+
+			}
+
+			return {
+				"init": _init,
+				"onMessageListUpdated": _onMessageListUpdated
+			}
+		}
+
 		return {
 			"init": _init,
 			"invite": _invite,
