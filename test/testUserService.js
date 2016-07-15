@@ -1,8 +1,6 @@
-require("../scripts/userStorage");
-
 var EventBus = require('../scripts/lib/eventBus');
-var UserStorage = require('../scripts/userStorage');
-var UserService = require('../scripts/userService');
+var UserStorage = require('../scripts/storage/userStorage');
+var UserService = require('../scripts/service/userService');
 var UserDto = require('../scripts/userDto');
 
 describe("User service test-suite", function() {
