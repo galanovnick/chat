@@ -7,11 +7,11 @@ var MessageService = function(_eventBus, _messageStorage) {
 
 	var _onMessageAdded = function(message) {
 
-		if (message.text == "") {
+		if (typeof message.text === 'undefined' || message.text === null || message.text === "") {
 
 			_eventBus.post("Message text cannot be empty.", events.messageAdditionFailedEvent);
 		} else {
-			_messageStorage.put(message.username, message.text);
+			_messageStorage.put(message);
 
 			_eventBus.post(_messageStorage.getAll(), events.messageSuccessfullyAddedEvent);
 		}
@@ -19,6 +19,14 @@ var MessageService = function(_eventBus, _messageStorage) {
 
 	return {
 		"onMessageAdded": _onMessageAdded,
-		"getAll": _messageStorage.getAll()
+		"getAll": _messageStorage.getAll
 	}
 }
+
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module);
+}
+
+define(function() {
+	return MessageService;
+});
