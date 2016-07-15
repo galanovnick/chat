@@ -9,7 +9,7 @@ var ChatApp = function(_rootId) {
 		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
 	}
 
-	var _userContext = {username: "Vasya"};
+	var _userContext = {username: "User"};
 
 	var _components = {};
 
@@ -32,8 +32,8 @@ var ChatApp = function(_rootId) {
 			_components.registration.hide();
 
 			_components.main = MenuComponent("main-" + _rootId);
-			_components.chatRooms = [];
-			_components.chatRooms.push(ChatRoomComponent("chat-room№1", EventBus(), _userContext.username, "Some Chat"));
+
+			_createChatRoom(ChatRoomComponent("chat-room№1", EventBus(), _userContext.username, "Some Chat"));
 
 			_components.main.init();
 			_components.chatRooms[0].init();
@@ -41,11 +41,11 @@ var ChatApp = function(_rootId) {
 	}
 
 	var _createChatRoom = function(_chatRoom) {
-		if (typeof _components.rooms === 'undefined') {
-			_components.rooms = [];
+		if (typeof _components.chatRooms === 'undefined') {
+			_components.chatRooms = [];
 		}
 
-		_components.rooms.push(_chatRoom);
+		_components.chatRooms.push(_chatRoom);
 	}
 
 	var RegistrationComponent = function(_componentRootId) {
@@ -70,7 +70,7 @@ var ChatApp = function(_rootId) {
 		}
 
 		var _register = function(user) {
-			console.log("Trying to post 'userAddedEvent' (user = " + user.username + ")...")
+			console.log("Trying to post 'userAddedEvent' (user = " + user.username + ")...");
 			_userEventBus.post(user, events.userAddedEvent);
 
 		}
@@ -119,11 +119,13 @@ var ChatApp = function(_rootId) {
 	var UserListComponent = function(_componentRootId) {
 
 		var _init = function() {
-			$('<div style=padding:10px>Registered users:<div id="users"></div></div>')
+			$('<div>Registered users:</div>')
 				.appendTo("#" + _rootId)
 					.css({width: '200px', height: '200px', padding: '20px', 'margin-left': 'auto', 'margin-right': 'auto', 
 						'margin-top': '20px', 'border': '2px solid black', 'border-radius': '10px'})
-					.attr('id', _componentRootId);
+					.attr('id', _componentRootId)
+						.append('<div></div>')
+							.attr('id', 'users');
 
 			_render(_userService.getAll());
 		}
@@ -154,7 +156,8 @@ var ChatApp = function(_rootId) {
 			$('<div><input type="button" id="new-room" value="New chat" style="width: 110px; height: 25px; margin: 8px;"/>' +
 				'<input type="button" id="join-room" value="Join chat" style="width: 110px; height: 25px; margin: 8px;"/></div>')
 				.appendTo("#" + _rootId)
-					.css({width: '128px', height: '83px', 'margin-right': 'auto', 'margin-top': '20px', border: '2px solid black', 'border-radius': '10px'})
+					.css({width: '128px', height: '83px', 'margin-right': 'auto', 'margin-top': '20px', 
+						border: '2px solid black', 'border-radius': '10px'})
 					.attr("id", _componentRootId);
 		}
 
@@ -176,7 +179,7 @@ var ChatApp = function(_rootId) {
 
 		var _messageService = MessageService(_chatRoomEventBus, MessageStorage());
 
-		_subComponents = {};
+		_chatRoomComponents = {};
 
 		var _init = function() {
 			console.log("Trying to initialie chat room with id = '" + _componentRootId + "' and owner = '" + _ownerName + "'...");
@@ -188,16 +191,16 @@ var ChatApp = function(_rootId) {
 
 			members = [_ownerName];
 
-			_subComponents.messageList = MessageListComponent();
-			_subComponents.addMessage = AddMessageComponent();
+			_chatRoomComponents.messageList = MessageListComponent();
+			_chatRoomComponents.addMessage = AddMessageComponent();
 
 			_chatRoomEventBus.subscribe(chatRoomEvents.messageAddedEvent, _messageService.onMessageAdded);
-			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _subComponents.addMessage.onMessageSuccessfullyAdded);
-			_chatRoomEventBus.subscribe(chatRoomEvents.messageAdditionFailedEvent, _subComponents.addMessage.onMessageAdditionFailed);
-			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _subComponents.messageList.onMessageListUpdated);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _chatRoomComponents.addMessage.onMessageSuccessfullyAdded);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageAdditionFailedEvent, _chatRoomComponents.addMessage.onMessageAdditionFailed);
+			_chatRoomEventBus.subscribe(chatRoomEvents.messageSuccessfullyAddedEvent, _chatRoomComponents.messageList.onMessageListUpdated);
 
-			Object.keys(_subComponents).forEach(function(key) {
-				_subComponents[key].init();
+			Object.keys(_chatRoomComponents).forEach(function(key) {
+				_chatRoomComponents[key].init();
 			});
 		}
 
