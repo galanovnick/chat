@@ -3,7 +3,8 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
 		userListUpdatedEvent: "USER_LIST_UPDATED_EVENT",
-		registrationFailedEvent : "REGISTRATION_FAILED_EVENT"
+		registrationFailedEvent : "REGISTRATION_FAILED_EVENT",
+		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
 	}
 
 	var _userContext/* = {username: "Vasya"}*/;
@@ -17,7 +18,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 		_userEventBus.subscribe(events.userAddedEvent, _userService.onUserAdded);
 		_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.onUserListUpdated);
-		_userEventBus.subscribe(events.registrationSuccessEvent, _components.registration.onRegistrationSuccess);
+		_userEventBus.subscribe(events.successfullRegistrationEvent, _components.registration.onRegistrationSuccess);
 		_userEventBus.subscribe(events.registrationFailedEvent, _components.registration.onRegistrationFailed);
 
 		Object.keys(_components).forEach(function(key) {

@@ -3,7 +3,8 @@ var UserService = function(_userEventBus, _userStorage) {
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
 		userListUpdatedEvent: "USER_LIST_UPDATED_EVENT",
-		registrationFailedEvent : "REGISTRATION_FAILED_EVENT"
+		registrationFailedEvent : "REGISTRATION_FAILED_EVENT",
+		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
 	}
 
 	var _create = function(user) {
@@ -27,6 +28,7 @@ var UserService = function(_userEventBus, _userStorage) {
 			_userStorage.add({username: user.username, password: user.password}); //or DTO???
 
 			_userEventBus.post(_userStorage.getAll(), events.userListUpdatedEvent);
+			_userEventBus.post("", events.successfullRegistrationEvent);
 		}
 	}
 
