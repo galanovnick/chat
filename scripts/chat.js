@@ -155,19 +155,26 @@ var ChatApp = function(_rootId) {
 		var _init = function() {
 			$('<div></div>')
 				.appendTo("#" + _rootId)
-					.css({width: '128px', height: '83px', 'margin-right': 'auto', 'margin-top': '20px', 
+					.css({width: '258px', height: '83px', 'margin-right': 'auto', 'margin-top': '20px', 
 						border: '2px solid black', 'border-radius': '10px'})
 					.attr("id", _componentRootId)
 						.append($('<input/>')
 							.attr('type', 'button')
 							.attr('id', 'new-room')
 							.val('New chat')
-							.css({width: '110px', height: '25px', margin: '8px'}))
+							.css({width: '110px', height: '25px', margin: '8px', display: 'inline'}))
+						.append($('<input/>')
+							.attr('type', 'text')
+							.attr('id', 'room-name')
+							.attr('placeholder', 'Chat name')
+							.css({width: '80px', height: '15px', margin: '8px'}))
 						.append($('<input/>')
 							.attr('type', 'button')
 							.attr('id', 'join-room')
-							.val('New chat')
+							.val('Join chat')
 							.css({width: '110px', height: '25px', margin: '8px'}));
+
+			$("#" + _componentRootId + ".new-room")
 		}
 
 		return {
