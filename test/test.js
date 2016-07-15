@@ -1,15 +1,11 @@
 require("../scripts/userStorage");
 
+var EventBus = require('../scripts/lib/eventBus');
 var UserStorage = require('../scripts/userStorage');
 var UserService = require('../scripts/userService');
 var UserDto = require('../scripts/userDto');
 
-var fakeEventBusImpl = {
-	"post": function(){},
-	"subscribe": function(){}
-};
-
-var userService = UserService(fakeEventBusImpl, UserStorage());
+var userService = UserService(EventBus(), UserStorage());
 
 var firstUser = UserDto("vasya", "qwerty", "qwerty");
 var secondUser = UserDto("petya", "123456", "123456");
@@ -17,14 +13,14 @@ var duplicatedFirstUser = UserDto("vasya", "555", "555");
 var userWithDifferentPasswords = UserDto("masha", "123", "132");
 var userWithEmptyFields = UserDto("", "", "");
 
-userService.create(firstUser);
-userService.create(secondUser);
+userService.onUserAdded(firstUser);
+userService.onUserAdded(secondUser);
 
-userService.create(duplicatedFirstUser);
+userService.onUserAdded(duplicatedFirstUser);
 
-userService.create(userWithDifferentPasswords);
+userService.onUserAdded(userWithDifferentPasswords);
 
-userService.create(userWithEmptyFields);
+userService.onUserAdded(userWithEmptyFields);
 
 var allusers = userService.getAll();
 

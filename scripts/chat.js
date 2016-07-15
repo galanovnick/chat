@@ -14,11 +14,11 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 
 		_components.registration = RegistrationComponent("reg-" + _rootId);
 		_components.userList = UserListComponent("u_list_" + _rootId);
-		//TODO: remove direct method calls. Add on{$EVENT_NAME} methods to all components.
-		_userEventBus.subscribe(events.userAddedEvent, _userService.create);
-		_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.render);
-		_userEventBus.subscribe(events.userListUpdatedEvent, _components.registration.resetFields);
-		_userEventBus.subscribe(events.registrationFailedEvent, _components.registration.registrationFailed);
+
+		_userEventBus.subscribe(events.userAddedEvent, _userService.onUserAdded);
+		_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.onUserListUpdated);
+		_userEventBus.subscribe(events.registrationSuccessEvent, _components.registration.onRegistrationSuccess);
+		_userEventBus.subscribe(events.registrationFailedEvent, _components.registration.onRegistrationFailed);
 
 		Object.keys(_components).forEach(function(key) {
 
@@ -93,12 +93,20 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			$("#" + _componentRootId).remove();
 		}
 
+		var _onRegistrationFailed = function(message) {
+			_registrationFailed(message);
+		}
+
+		var _onRegistrationSuccess = function() {
+			_resetFields();
+		}
+
 		return {
 			"init": _init,
 			"hide": _hide,
 			"register": _register,
-			"registrationFailed": _registrationFailed,
-			"resetFields": _resetFields
+			"onRegistrationSuccess": _onRegistrationSuccess,
+			"onRegistrationFailed": _onRegistrationFailed
 		}
 	}
 
@@ -125,9 +133,13 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			});
 		}
 
+		var _onUserListUpdated = function(users) {
+			_render(users);
+		}
+
 		return {
 			"init": _init,
-			"render": _render
+			"onUserListUpdated": _onUserListUpdated
 		}
 	}
 

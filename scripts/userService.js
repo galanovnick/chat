@@ -36,8 +36,12 @@ var UserService = function(_userEventBus, _userStorage) {
 		return _userStorage.getAll();
 	}
 
+	var _onUserAdded = function(user) {
+		_create(user);
+	}
+
 	return {
-		"create": _create,
+		"onUserAdded": _onUserAdded,
 		"getAll": _getAll
 	}
 }
