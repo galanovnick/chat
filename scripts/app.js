@@ -13,12 +13,6 @@ define(function(require) {
 	require('./lib/eventBus');
 	require('./userService');
 
-	var eb = EventBus();
-
-	var chat = ChatApp(
-			"chat-container",
-			eb,
-			UserService(eb, UserStorage())
-		).init();
+	var chat = ChatApp("chat-container").init();
 
 });		

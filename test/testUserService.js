@@ -5,7 +5,7 @@ var UserStorage = require('../scripts/userStorage');
 var UserService = require('../scripts/userService');
 var UserDto = require('../scripts/userDto');
 
-describe("test-suite", function() {
+describe("User service test-suite", function() {
 
 	var test = require("unit.js");
 

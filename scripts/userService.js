@@ -32,19 +32,13 @@ var UserService = function(_userEventBus, _userStorage) {
 		}
 	}
 
-	var _getAll = function() {
-		console.log("Trying to provide user list(" + Object.keys(_userStorage) + ")...");
-
-		return _userStorage.getAll();
-	}
-
 	var _onUserAdded = function(user) {
 		_create(user);
 	}
-
+	
 	return {
 		"onUserAdded": _onUserAdded,
-		"getAll": _getAll
+		"getAll": _userStorage.getAll
 	}
 }
 

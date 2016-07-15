@@ -1,4 +1,7 @@
-var ChatApp = function(_rootId, _userEventBus, _userService) {
+var ChatApp = function(_rootId) {
+
+	_userEventBus = EventBus();
+	_userService = UserService(_userEventBus, UserStorage());
 
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
@@ -7,17 +10,17 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
 	}
 
-	var _userContext/* = {username: "Vasya"}*/;
+	var _userContext = {username: "Vasya"};
 
 	var _components = {};
 
 	var _init = function() {
 
 		_components.registration = RegistrationComponent("reg-" + _rootId);
-		_components.userList = UserListComponent("u_list_" + _rootId);
+		//_components.userList = UserListComponent("u_list_" + _rootId);
 
 		_userEventBus.subscribe(events.userAddedEvent, _userService.onUserAdded);
-		_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.onUserListUpdated);
+		//_userEventBus.subscribe(events.userListUpdatedEvent, _components.userList.onUserListUpdated);
 		_userEventBus.subscribe(events.successfullRegistrationEvent, _components.registration.onRegistrationSuccess);
 		_userEventBus.subscribe(events.registrationFailedEvent, _components.registration.onRegistrationFailed);
 
@@ -30,6 +33,8 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 			_components.registration.hide();
 
 			_components.main = MainWindowComponent("main-" + _rootId);
+			_components.chatRooms = [];
+			_components.chatRooms.push("chat-room#1-" + _rootId, EventBus(), _userContext.username);
 
 			_components.main.init();
 		}
@@ -55,13 +60,13 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 					.css({margin: 'auto', width: '200px', height: '205px', padding: '20px', border: '2px solid black', 'border-radius': '10px'})
 					.attr('id', _componentRootId);
 
-			document.getElementById("register").onclick = function() {
+			$("#register").click(function() {
 				var username = $("#username").val();
 				var password = $("#password").val();
 				var password_r = $("#password_r").val();
 
 				_register(UserDto(username, password, password_r));				
-			}
+			});
 		}
 
 		var _register = function(user) {
@@ -172,7 +177,7 @@ var ChatApp = function(_rootId, _userEventBus, _userService) {
 		var _close = function() {
 			console.log("Trying to close chat room with id = '" + _chatRoomId + "'...");
 
-			document.getElementById(_chatRoomId).remove();
+			$("#" + _chatRoomId).remove();
 			members = null;
 		}
 
