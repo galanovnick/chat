@@ -1,4 +1,4 @@
-var UserService = function(_userEventBus, _userStorage) {
+var UserService = function(_userEventBus, _storage) {
 
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
@@ -20,41 +20,29 @@ var UserService = function(_userEventBus, _userStorage) {
 			console.log("Failed creation of user '" + user.username + "'. Reason: passwords do not match.");
 
 			_userEventBus.post("Passwords do not match.", events.registrationFailedEvent);
-		} else if (_userStorage.hasUser(user.username)) {
-			console.log("Failed creation of user '" + user.username + "'. Reason: user already exists.");
-
+		} else if (userExists(user)){
 			_userEventBus.post("User already exists.", events.registrationFailedEvent);
 		} else {
 			console.log("User(" + user.username + ") created.")
 
-			_userStorage.add({username: user.username, password: user.password}); //or DTO???
+			_storage.addItem("users", {username: user.username, password: user.password});
 
-			_userEventBus.post(_userStorage.getAll(), events.userListUpdatedEvent);
 			_userEventBus.post("", events.successfullRegistrationEvent);
 		}
 	}
 
 	var _authenticate = function(user) {
 		if (user.username === "" || user.password === "") {
-
 			_userEventBus.post("Fields cannot be empty.", events.authenticationFailedEvent);
 		} else {
-			var userExistsKey = false;
-			var allUsers = _userStorage.getAll();
-			Object.keys(allUsers).forEach(function(elem) {
-				if (elem === user.username && allUsers[elem] === user.password) {
-					
-					_userStorage.addAuthenticated(user);
-					_userEventBus.post("", events.successfullAuthenticationEvent);
-					userExistsKey = true;
+			if (userExists(user)) {
 
-					return;
-				}
-			});
+				_userEventBus.post(user.username, events.successfullAuthenticationEvent);
 
-			if (!userExistsKey) {
-				_userEventBus.post("User does not exist.", events.authenticationFailedEvent);
+				return;
 			}
+
+			_userEventBus.post("User does not exist.", events.authenticationFailedEvent);	
 		}
 	}
 
@@ -63,14 +51,29 @@ var UserService = function(_userEventBus, _userStorage) {
 	}
 	
 	var _onUserAuthenticated = function(user) {
-		_authenticate(user);
+		return _authenticate(user);
+	}
+
+	var userExists = function(user) {
+		var users = _storage.getItems("users");
+		var userExistsKey = false;
+		users.forEach(function(item) {
+			if (item.username === user.username) {
+				userExistsKey = true;
+				return;
+			}
+		});
+		return userExistsKey;
+	}
+
+	var _getAll = function() {
+		return _storage.getItems("users");
 	}
 
 	return {
 		"onUserAdded": _onUserAdded,
 		"onUserAuthenticated": _onUserAuthenticated,
-		"getAll": _userStorage.getAll,
-		"getAllAuthenticated": _userStorage.getAllAuthenticated
+		"getAll": _getAll
 	}
 }
 

@@ -1,6 +1,5 @@
 var EventBus = require('../scripts/lib/eventBus');
 var MessageService = require('../scripts/service/messageService');
-var MessageStorage = require('../scripts/storage/messageStorage');
 var MessageDto = require('../scripts/dto/messageDto');
 
 describe("Message service test-suite", function() {
@@ -8,7 +7,7 @@ describe("Message service test-suite", function() {
 
 	it("Should add messages", function() {
 
-		var messageService = MessageService(EventBus(), MessageStorage());
+		var messageService = MessageService(EventBus());
 
 		var message = MessageDto("Vasya", "Hello world!");
 
@@ -25,7 +24,7 @@ describe("Message service test-suite", function() {
 
 	it("Should not add empty messages", function() {
 
-		var messageService = MessageService(EventBus(), MessageStorage());
+		var messageService = MessageService(EventBus());
 
 		var emptyMessage1 = MessageDto("Vasya", "");
 		var emptyMessage2 = MessageDto("Vasya");

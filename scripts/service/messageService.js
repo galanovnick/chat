@@ -1,4 +1,4 @@
-var MessageService = function(_eventBus, _messageStorage) {
+var MessageService = function(_eventBus, _storage, _roomId) {
 
 	var events = {
 		messageAdditionFailedEvent: "MESSAGE_ADDITION_FAILED_EVENT",
@@ -11,15 +11,19 @@ var MessageService = function(_eventBus, _messageStorage) {
 
 			_eventBus.post("Message text cannot be empty.", events.messageAdditionFailedEvent);
 		} else {
-			_messageStorage.put(message);
+			_storage.addItem("messages" + _roomId, message);
 
-			_eventBus.post(_messageStorage.getAll(), events.messageSuccessfullyAddedEvent);
+			_eventBus.post(_storage.getItems("messages" + _roomId), events.messageSuccessfullyAddedEvent);
 		}
+	}
+
+	var _getAll = function() {
+		return _storage.getItems("messages" + _roomId);
 	}
 
 	return {
 		"onMessageAdded": _onMessageAdded,
-		"getAll": _messageStorage.getAll
+		"getAll": _getAll
 	}
 }
 

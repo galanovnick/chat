@@ -1,11 +1,9 @@
-//TODO: remove services and storages from constructors.
 //TODO: registration -> login -> add_chat
-//TODO: move css to css files
 
 var ChatApp = function(_rootId) {
 
 	_userEventBus = EventBus();
-	_userService = UserService(_userEventBus, UserStorage());
+	_userService = UserService(_userEventBus, Storage());
 
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
@@ -29,6 +27,7 @@ var ChatApp = function(_rootId) {
 		_userEventBus.subscribe(events.registrationFailedEvent, _components.registrationComponent.onRegistrationFailed);
 		_userEventBus.subscribe(events.authenticationFailedEvent, _components.loginComponent.onUserAuthenticationFailed);
 		_userEventBus.subscribe(events.successfullAuthenticationEvent, _components.loginComponent.onUserSuccessfullyAuthenticated);
+		_userEventBus.subscribe(events.successfullAuthenticationEvent, _createUserBox);
 
 		Object.keys(_components).forEach(function(key) {
 
@@ -36,12 +35,14 @@ var ChatApp = function(_rootId) {
 		});
 	}
 
-	var _createChatRoom = function(_chatRoom) {
-		if (typeof _components.chatRooms === 'undefined') {
-			_components.chatRooms = [];
+	var _createUserBox = function(_userName) {
+		if (typeof _components.userBoxes === 'undefined') {
+			_components.userBoxes = [];
 		}
+		var userBox = UserBoxComponent(_userName, EventBus());
+		userBox.init();
 
-		_components.chatRooms.push(_chatRoom);
+		_components.userBoxes.push(userBox);
 	}
 
 	var RegistrationComponent = function(_componentRootId) {
@@ -50,7 +51,7 @@ var ChatApp = function(_rootId) {
 			$('<div>')
 				.html('Registration')
 				.addClass('container')
-				.appendTo('#' + _rootId)
+				.appendTo('#' + _rootId + " .login-reg")
 					.attr('id', _componentRootId)
 						.append($('<input/>')
 							.attr('type', 'text')
@@ -124,9 +125,9 @@ var ChatApp = function(_rootId) {
 
 		var _init = function() {
 			$('<div>')
-				.html('Login')
+				.html('Login </br>')
 				.addClass('container')
-				.appendTo("#" + _rootId)
+				.appendTo('#' + _rootId + " .login-reg")
 					.attr('id', _componentRootId)
 						.append($('<input/>')
 							.attr('type', 'text')
@@ -136,7 +137,7 @@ var ChatApp = function(_rootId) {
 							.attr('type', 'password')
 							.attr('placeholder', 'Password')
 							.addClass('password'))
-						.append($('<input/>')
+						.append($('</br><input/>')
 							.attr('type', 'button')
 							.val('Login')
 							.addClass('login'))
@@ -175,31 +176,73 @@ var ChatApp = function(_rootId) {
 		}
 	}
 
-	var SessionComponent = function() {
-		
-	}
+	var UserBoxComponent = function(_componentRootId, _userBoxEventBus) {
 
-	var MenuComponent = function(_componentRootId) {
+		var events = {
+			createRoomButtonClickedEvent: "CREATE_ROOM_BUTTON_CLICK_EVENT",
+			roomSuccessfullyCreatedEvent: "ROOM_SUCCESSFULLY_CREATED_EVENT",
+			roomCreationFailedEvent: "ROOM_CREATION_FAILED_EVENT"
+		}
+
+		var roomsCounter = 0;
 
 		var _init = function() {
 			$('<div></div>')
-				.appendTo("#" + _rootId)
-				.addClass('container')
-					.attr("id", _componentRootId)
-						.append($('<input/>')
-							.attr('type', 'button')
-							.attr('id', 'new-room')
-							.val('New chat'))
-						.append($('<input/>')
-							.attr('type', 'text')
-							.attr('id', 'room-name')
-							.attr('placeholder', 'Chat name'))
-						.append($('<input/>')
-							.attr('type', 'button')
-							.attr('id', 'join-room')
-							.val('Join chat'));
+				.appendTo("#" + _rootId + " .main-content")
+				.addClass('container user-box')
+				.attr("id", _componentRootId)
+					.append($('<font>')
+						.html('User: ' + _componentRootId))
+					.append($('<input/>')
+						.attr('type', 'button')
+						.addClass('new-room')
+						.val('New chat'))
+					.append($('<input/>')
+						.attr('type', 'button')
+						.addClass('join-room')
+						.val('Join chat'))
+					.append($('<input/>')
+						.attr('type', 'text')
+						.addClass('room-name')
+						.attr('placeholder', 'Chat name'))
+					.append($('<font>')
+						.attr('color', 'red')
+						.addClass('error'));
 
-			$("#" + _componentRootId + ".new-room")
+			_userBoxEventBus.subscribe(events.createRoomButtonClickedEvent, _createChatRoom);
+			_userBoxEventBus.subscribe(events.roomSuccessfullyCreatedEvent, _onRoomSuccessfullyCreated);
+			_userBoxEventBus.subscribe(events.roomCreationFailedEvent, _onRoomCreationFailed);			
+
+			$("#" + _componentRootId + " .new-room").click(function() {
+				var roomId = _componentRootId + roomsCounter++;
+				var newRoomData = {username: _componentRootId, roomName: $("#" + _componentRootId + " .room-name").val(), roomId: roomId};
+				_userBoxEventBus.post(newRoomData, events.createRoomButtonClickedEvent);
+			});
+		}
+
+		var _createChatRoom = function(_roomData) {
+			if (_roomData.roomName === '') {
+				_userBoxEventBus.post("Chat name cannot be empty.", events.roomCreationFailedEvent);
+				return;
+			}
+			if (typeof _components.chatRooms === 'undefined') {
+				_components.chatRooms = [];
+			}
+			var room = ChatRoomComponent(_roomData);
+			room.init();
+
+			_components.chatRooms.push(room);
+
+			_userBoxEventBus.post("", events.roomSuccessfullyCreatedEvent);
+		}
+
+		var _onRoomCreationFailed = function(message) {
+			$("#" + _componentRootId + " .error").html(message);
+		}
+
+		var _onRoomSuccessfullyCreated = function() {
+			$("#" + _componentRootId + " .error").html("");
+			$("#" + _componentRootId + " .room-name").val("");
 		}
 
 		return {
@@ -207,7 +250,7 @@ var ChatApp = function(_rootId) {
 		}
 	}
 
-	var ChatRoomComponent = function(_componentRootId, _chatRoomEventBus, _ownerName, _chatName) {
+	var ChatRoomComponent = function(_roomData) {
 
 		var chatRoomEvents = {
 			messageAddedEvent: "MESSAGE_ADDED_EVENT",
@@ -215,10 +258,15 @@ var ChatApp = function(_rootId) {
 			messageAdditionFailedEvent: "MESSAGE_ADDITION_FAILED_EVENT",
 			messagesListUpdatedEvent: "MESSAGES_LIST_UPDATED_EVENT"
 		}
+		var _ownerName = _roomData.username;
 
-		var members;
+		var _chatName = _roomData.roomName;
 
-		var _messageService = MessageService(_chatRoomEventBus, MessageStorage());
+		var _componentRootId = _roomData.roomId;
+
+		var _chatRoomEventBus = EventBus();
+
+		var _messageService = MessageService(_chatRoomEventBus, Storage());
 
 		_chatRoomComponents = {};
 
@@ -227,11 +275,12 @@ var ChatApp = function(_rootId) {
 		var _init = function() {
 			console.log("Trying to initialie chat room with id = '" + _componentRootId + "' and owner = '" + _ownerName + "'...");
 
-			$('<div>' + _chatName + '<hr></div>')
-				.appendTo("#" + _rootId)
+			$('<div>' + _chatName + ' | owner: ' + _ownerName + '</div>')
+				.appendTo("#" + _rootId + " .main-content")
 				.addClass('container')
 					.attr('id', _componentRootId)
-						.append('<div class="chat-room-content"></div>');
+						.append($('<div>')
+							.addClass('chat-room-content'));
 
 			/*$("<input/>")
 				.appendTo("#" + _componentRootId)
@@ -246,8 +295,6 @@ var ChatApp = function(_rootId) {
 					.css({width: '100px', height: '20px', 'margin': '5px'});*/
 
 			_chatRoomDomContent = $("#" + _componentRootId + " .chat-room-content");
-
-			members = [_ownerName];
 
 			_chatRoomComponents.messageListComponent = MessageListComponent();
 			_chatRoomComponents.addMessageComponent = AddMessageComponent();
@@ -265,7 +312,7 @@ var ChatApp = function(_rootId) {
 		var AddMessageComponent = function() {
 
 			var _init = function() {
-				$('<textarea></textarea>')
+				$('<textarea>')
 					.appendTo(_chatRoomDomContent)
 						.attr('placeholder', 'Type message here')
 						.addClass('message-input-box');
@@ -274,12 +321,13 @@ var ChatApp = function(_rootId) {
 						.attr('type', 'button')
 						.attr('value', 'Send')
 						.addClass('send-message-btn');
-				$('<div></div>')
+				$('<font>')
 					.appendTo(_chatRoomDomContent)
+						.attr('color', 'red')
 						.addClass('error');
 
 				$(_chatRoomDomContent).children(".send-message-btn").click(function() {
-					var message = MessageDto(_userContext.username, $(_chatRoomDomContent).children(".message-input-box").val());
+					var message = MessageDto(_ownerName.username, $(_chatRoomDomContent).children(".message-input-box").val());
 
 					_chatRoomEventBus.post(message ,chatRoomEvents.messageAddedEvent);
 				});

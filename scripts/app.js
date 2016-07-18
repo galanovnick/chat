@@ -7,10 +7,9 @@ requirejs.config({
 
 define(function(require) {
 
+	require("./storage/storage")
 	require("./dto/userDto");
 	require("./dto/messageDto");
-	require("./storage/userStorage");
-	require("./storage/messageStorage");
 	require('./service/userService');
 	require('./service/messageService');
 	require('./chat');
