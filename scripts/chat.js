@@ -28,17 +28,6 @@ var ChatApp = function(_rootId) {
 
 			_components[key].init();
 		});
-
-		if (typeof _userContext !== 'undefined') {
-			_components.registration.hide();
-
-			_components.main = MenuComponent("main-" + _rootId);
-
-			_createChatRoom(ChatRoomComponent("chat-room№1", EventBus(), _userContext.username, "Some Chat"));
-
-			_components.main.init();
-			_components.chatRooms[0].init();
-		}
 	}
 
 	var _createChatRoom = function(_chatRoom) {
@@ -172,39 +161,6 @@ var ChatApp = function(_rootId) {
 
 	var SessionComponent = function() {
 		
-	}
-
-	var UserListComponent = function(_componentRootId) {
-
-		var _init = function() {
-			$('<div>Registered users:</div>')
-				.appendTo("#" + _rootId)
-				.addClass('container')
-					.attr('id', _componentRootId)
-						.append('<div></div>')
-							.attr('id', 'users');
-
-			_render(_userService.getAll());
-		}
-
-		var _render = function(users) {
-			$("#users").html("");
-
-			Object.keys(users).forEach(function(username) {
-				$('<div> Username: ' + username + '</div>')
-					.appendTo("#users")
-						.css("padding", "10px");
-			});
-		}
-
-		var _onUserListUpdated = function(users) {
-			_render(users);
-		}
-
-		return {
-			"init": _init,
-			"onUserListUpdated": _onUserListUpdated
-		}
 	}
 
 	var MenuComponent = function(_componentRootId) {
