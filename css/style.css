@@ -1,9 +1,9 @@
-* {
+#chat-container *{
 	margin: 1%;
+	padding: 1%;
 }
 
 .container {
-	padding: 10px;
 	border: 2px solid black;
 	border-radius: 10px;
 	width: 20%;

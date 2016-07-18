@@ -4,7 +4,9 @@ var UserService = function(_userEventBus, _userStorage) {
 		userAddedEvent : "USER_ADDED_EVENT",
 		userListUpdatedEvent: "USER_LIST_UPDATED_EVENT",
 		registrationFailedEvent : "REGISTRATION_FAILED_EVENT",
-		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
+		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT",
+		authenticationFailedEvent: "AUTHENTICATION_FAILED_EVENT",
+		successfullAuthenticationEvent: "SUCCESSFUL_AUTHENTICATION_EVENT"
 	}
 
 	var _create = function(user) {
@@ -32,12 +34,35 @@ var UserService = function(_userEventBus, _userStorage) {
 		}
 	}
 
+	var _authenticate = function(user) {
+		if (user.username === "" || user.password === "") {
+
+			_userEventBus.post("Fields cannot be empty.", events.authenticationFailedEvent);
+		} else {
+			var allUsers = _userStorage.getAll();
+			Object.keys(allUsers).forEach(function(elem) {
+				if (elem === user.username && allUsers[elem] === user.password) {
+					
+					_userStorage.addAuthenticated(user);
+					_userEventBus("", events.successfullAuthenticationEvent);
+
+					return;
+				}
+			});
+		}
+	}
+
 	var _onUserAdded = function(user) {
 		_create(user);
 	}
 	
+	var _onUserAuthenticated = function(user) {
+		_authenticate(user);
+	}
+
 	return {
 		"onUserAdded": _onUserAdded,
+		"onUserAuthenticated": _onUserAuthenticated,
 		"getAll": _userStorage.getAll
 	}
 }
