@@ -10,19 +10,25 @@ var ChatApp = function(_rootId) {
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
 		registrationFailedEvent : "REGISTRATION_FAILED_EVENT",
-		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT"
+		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT",
+		userAuthenticatedEvent: "USER_AUTHENTICATED_EVENT",
+		authenticationFailedEvent: "AUTHENTICATION_FAILED_EVENT",
+		successfullAuthenticationEvent: "SUCCESSFUL_AUTHENTICATION_EVENT"
 	}
 
 	var _components = {};
 
 	var _init = function() {
 
-		_components.registration = RegistrationComponent("reg-" + _rootId);
-		_components.login = UserLoginComponent("login-" + _rootId);
+		_components.registrationComponent = RegistrationComponent("reg-" + _rootId);
+		_components.loginComponent = UserLoginComponent("login-" + _rootId);
 
 		_userEventBus.subscribe(events.userAddedEvent, _userService.onUserAdded);
-		_userEventBus.subscribe(events.successfullRegistrationEvent, _components.registration.onRegistrationSuccess);
-		_userEventBus.subscribe(events.registrationFailedEvent, _components.registration.onRegistrationFailed);
+		_userEventBus.subscribe(events.userAuthenticatedEvent, _userService.onUserAuthenticated);
+		_userEventBus.subscribe(events.successfullRegistrationEvent, _components.registrationComponent.onRegistrationSuccess);
+		_userEventBus.subscribe(events.registrationFailedEvent, _components.registrationComponent.onRegistrationFailed);
+		_userEventBus.subscribe(events.authenticationFailedEvent, _components.loginComponent.onUserAuthenticationFailed);
+		_userEventBus.subscribe(events.successfullAuthenticationEvent, _components.loginComponent.onUserSuccessfullyAuthenticated);
 
 		Object.keys(_components).forEach(function(key) {
 
@@ -61,8 +67,10 @@ var ChatApp = function(_rootId) {
 						.append($('<input/>')
 							.attr('type', 'button')
 							.val('Register')
-							.addClass('register'));
-
+							.addClass('register'))
+						.append($('<font>')
+							.addClass('error')
+							.attr('color', 'red'));
 
 			$("#" + _componentRootId + " .register").click(function() {
 				var username = $("#" + _componentRootId + " .username").val();
@@ -80,23 +88,15 @@ var ChatApp = function(_rootId) {
 		}
 
 		var _registrationFailed = function(message) {
-			if (!$("#reg_error").length) {
-				$('<font id = "reg_error" color="red" style=padding:10px;>' + message + '</font>')
-					.appendTo("#" + _componentRootId)
-					.attr('id', 'reg_error');
-			} else {
-				$("#reg_error").html(message);
-			}
+			$("#" + _componentRootId + " .error").html(message);
 		}
 
 		var _resetFields = function() {
-			if ($("#reg_error").length) {
-				$("#reg_error").html("");
-			}
+			$("#" + _componentRootId + " .error").html("");
 
-			$("#username").val("");
-			$("#password").val("");
-			$("#password_r").val("");
+			$("#" + _componentRootId + " .username").val("");
+			$("#" + _componentRootId + " .password").val("");
+			$("#" + _componentRootId + " .password_r").val("");
 		}
 
 		var _hide = function() {
@@ -139,22 +139,38 @@ var ChatApp = function(_rootId) {
 						.append($('<input/>')
 							.attr('type', 'button')
 							.val('Login')
-							.addClass('login'));
+							.addClass('login'))
+						.append($('<font>')
+							.addClass('error')
+							.attr('color', 'red'));
 
 
 			$("#" + _componentRootId + " .login").click(function() {
 				var username = $("#" + _componentRootId + " .username").val();
 				var password = $("#" + _componentRootId + " .password").val();
 
-				_login(username, password);				
+				_login(UserDto(username, password, ""));				
 			});
 		}
 
-		var _login = function(username , password) {
+		var _login = function(user) {
+			_userEventBus.post(user, events.userAuthenticatedEvent);
+		}
 
+		var _onUserSuccessfullyAuthenticated = function() {
+			$("#" + _componentRootId + " .error").html("");
+
+			$("#" + _componentRootId + " .username").val("");
+			$("#" + _componentRootId + " .password").val("");
+		}
+
+		var _onUserAuthenticationFailed = function(message) {
+			$("#" + _componentRootId + " .error").html(message);
 		}
 
 		return {
+			"onUserSuccessfullyAuthenticated": _onUserSuccessfullyAuthenticated,
+			"onUserAuthenticationFailed": _onUserAuthenticationFailed,
 			"init": _init
 		}
 	}

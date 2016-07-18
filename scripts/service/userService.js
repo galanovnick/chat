@@ -39,16 +39,22 @@ var UserService = function(_userEventBus, _userStorage) {
 
 			_userEventBus.post("Fields cannot be empty.", events.authenticationFailedEvent);
 		} else {
+			var userExistsKey = false;
 			var allUsers = _userStorage.getAll();
 			Object.keys(allUsers).forEach(function(elem) {
 				if (elem === user.username && allUsers[elem] === user.password) {
 					
 					_userStorage.addAuthenticated(user);
 					_userEventBus.post("", events.successfullAuthenticationEvent);
+					userExistsKey = true;
 
 					return;
 				}
 			});
+
+			if (!userExistsKey) {
+				_userEventBus.post("User does not exist.", events.authenticationFailedEvent);
+			}
 		}
 	}
 
