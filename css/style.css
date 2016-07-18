@@ -1,0 +1,17 @@
+* {
+	margin: 1%;
+}
+
+.container {
+	padding: 10px;
+	border: 2px solid black;
+	border-radius: 10px;
+	width: 20%;
+	height: 100%;
+}
+
+.text-container {
+	word-wrap: break-word;
+	overflow-x: hidden;
+	overflow-y: auto;
+}

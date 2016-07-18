@@ -54,8 +54,8 @@ var ChatApp = function(_rootId) {
 		var _init = function() {
 			$('<div>')
 				.html('Registration')
-				.appendTo("#" + _rootId)
-					.css({margin: 'auto', width: '200px', height: '205px', padding: '20px', border: '2px solid black', 'border-radius': '10px'})
+				.addClass('container')
+				.appendTo('#' + _rootId)
 					.attr('id', _componentRootId)
 						.append($('<input/>')
 							.attr('type', 'text')
@@ -136,8 +136,8 @@ var ChatApp = function(_rootId) {
 		var _init = function() {
 			$('<div>')
 				.html('Login')
+				.addClass('container')
 				.appendTo("#" + _rootId)
-					.css({margin: 'auto', width: '200px', height: '205px', padding: '20px', border: '2px solid black', 'border-radius': '10px'})
 					.attr('id', _componentRootId)
 						.append($('<input/>')
 							.attr('type', 'text')
@@ -179,8 +179,7 @@ var ChatApp = function(_rootId) {
 		var _init = function() {
 			$('<div>Registered users:</div>')
 				.appendTo("#" + _rootId)
-					.css({width: '200px', height: '200px', padding: '20px', 'margin-left': 'auto', 'margin-right': 'auto', 
-						'margin-top': '20px', 'border': '2px solid black', 'border-radius': '10px'})
+				.addClass('container')
 					.attr('id', _componentRootId)
 						.append('<div></div>')
 							.attr('id', 'users');
@@ -213,24 +212,20 @@ var ChatApp = function(_rootId) {
 		var _init = function() {
 			$('<div></div>')
 				.appendTo("#" + _rootId)
-					.css({width: '258px', height: '83px', 'margin-right': 'auto', 'margin-top': '20px', 
-						border: '2px solid black', 'border-radius': '10px'})
+				.addClass('container')
 					.attr("id", _componentRootId)
 						.append($('<input/>')
 							.attr('type', 'button')
 							.attr('id', 'new-room')
-							.val('New chat')
-							.css({width: '110px', height: '25px', margin: '8px', display: 'inline'}))
+							.val('New chat'))
 						.append($('<input/>')
 							.attr('type', 'text')
 							.attr('id', 'room-name')
-							.attr('placeholder', 'Chat name')
-							.css({width: '80px', height: '15px', margin: '8px'}))
+							.attr('placeholder', 'Chat name'))
 						.append($('<input/>')
 							.attr('type', 'button')
 							.attr('id', 'join-room')
-							.val('Join chat')
-							.css({width: '110px', height: '25px', margin: '8px'}));
+							.val('Join chat'));
 
 			$("#" + _componentRootId + ".new-room")
 		}
@@ -262,7 +257,7 @@ var ChatApp = function(_rootId) {
 
 			$('<div>' + _chatName + '<hr></div>')
 				.appendTo("#" + _rootId)
-					.css({width: '250px', height: '370px', padding: '10px', margin: 'auto', border: '2px solid black', 'border-radius': '10px'})
+				.addClass('container')
 					.attr('id', _componentRootId)
 						.append('<div class="chat-room-content"></div>');
 
@@ -300,18 +295,15 @@ var ChatApp = function(_rootId) {
 			var _init = function() {
 				$('<textarea></textarea>')
 					.appendTo(_chatRoomDomContent)
-						.css({'margin-top': '5px', width: '245px', height: '40px', resize: 'none'})
 						.attr('placeholder', 'Type message here')
 						.addClass('message-input-box');
 				$('<input/>')
 					.appendTo(_chatRoomDomContent)
-						.css({width: '80px', height: '40px', display: 'inline'})
 						.attr('type', 'button')
 						.attr('value', 'Send')
 						.addClass('send-message-btn');
 				$('<div></div>')
 					.appendTo(_chatRoomDomContent)
-						.css({display: 'inline', margin: '3px', color: 'red', 'font-size': '10pt'})
 						.addClass('error');
 
 				$(_chatRoomDomContent).children(".send-message-btn").click(function() {
@@ -342,9 +334,7 @@ var ChatApp = function(_rootId) {
 			var _init = function() {
 				$('<div></div>')
 					.appendTo(_chatRoomDomContent)
-						.css({'word-wrap': 'break-word', 'overflow-x': 'hidden', 'overflow-y': 'auto', 'padding-left': '10px',
-							'padding-right': '10px', width: '230px', height: '225px', border: '1px solid black', 'border-radius': '10px'})
-						.addClass('messages');
+					.addClass('container text-container messages');
 			}
 
 			var _onMessageListUpdated = function(messages) {
