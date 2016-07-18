@@ -7,7 +7,7 @@ describe("User service test-suite", function() {
 
 	var test = require("unit.js");
 
-	it("Should create users.", function() {
+	it("Should create users", function() {
 
 		var userService = UserService(EventBus(), UserStorage());
 		var firstUser = UserDto("vasya", "qwerty", "qwerty");
@@ -23,7 +23,7 @@ describe("User service test-suite", function() {
 		;
 	});
 
-	it("Should not create users with duplicate names.", function() {
+	it("Should not create users with duplicate names", function() {
 		var userService = UserService(EventBus(), UserStorage());
 		var firstUser = UserDto("vasya", "qwerty", "qwerty");
 
@@ -41,7 +41,7 @@ describe("User service test-suite", function() {
 		;
 	});
 
-	it("Should not create users with different passwords.", function() {
+	it("Should not create users with different passwords", function() {
 		var userService = UserService(EventBus(), UserStorage());
 		var userWithDifferentPasswords = UserDto("masha", "123", "132");
 
@@ -56,9 +56,9 @@ describe("User service test-suite", function() {
 		;
 	});
 
-	it("Should not create users with empty name or passwords.", function() {
+	it("Should not create users with empty name", function() {
 		var userService = UserService(EventBus(), UserStorage());
-		var userWithEmptyFields = UserDto("", "", "");
+		var userWithEmptyFields = UserDto("", "123", "123");
 
 		userService.onUserAdded(userWithEmptyFields);
 
@@ -68,6 +68,78 @@ describe("User service test-suite", function() {
 			.object(allusers)
 				.hasLength(0)
 				.hasNotProperty(userWithEmptyFields.username, userWithEmptyFields.password)
+		;
+	});
+
+	it("Should not create users with empty password", function() {
+		var userService = UserService(EventBus(), UserStorage());
+		var userWithEmptyFields = UserDto("vasya", "", "123");
+
+		userService.onUserAdded(userWithEmptyFields);
+
+		var allusers = userService.getAll();
+
+		test
+			.object(allusers)
+				.hasLength(0)
+				.hasNotProperty(userWithEmptyFields.username, userWithEmptyFields.password)
+		;
+	});
+
+	it("Should not create users with empty password_r", function() {
+		var userService = UserService(EventBus(), UserStorage());
+		var userWithEmptyFields = UserDto("vasya", "123", "");
+
+		userService.onUserAdded(userWithEmptyFields);
+
+		var allusers = userService.getAll();
+
+		test
+			.object(allusers)
+				.hasLength(0)
+				.hasNotProperty(userWithEmptyFields.username, userWithEmptyFields.password)
+		;
+	});
+
+	it("Should authenticate users", function() {
+		var userService = UserService(EventBus(), UserStorage());
+		var user = UserDto("vasya", "123", "123");
+
+		userService.onUserAdded(user);
+		userService.onUserAuthenticated({username: user.username, password: user.password});
+
+		test
+			.array(userService.getAllAuthenticated())
+				.hasLength(1)
+				.hasProperty(0, user.username)
+		;
+	});
+
+	it("Should not authenticate users with empty username", function() {
+		var userService = UserService(EventBus(), UserStorage());
+		var user = UserDto("vasya", "123", "123");
+
+		userService.onUserAdded(user);
+		userService.onUserAuthenticated({username: "", password: user.password});
+		
+		test
+			.array(userService.getAllAuthenticated())
+				.hasLength(0)
+				.hasNotProperty(0, user.username)
+		;
+	});
+
+	it("Should not authenticate users with empty password", function() {
+		var userService = UserService(EventBus(), UserStorage());
+		var user = UserDto("vasya", "123", "123");
+
+		userService.onUserAdded(user);
+		userService.onUserAuthenticated({username: user.username, password: ""});
+		
+		test
+			.array(userService.getAllAuthenticated())
+				.hasLength(0)
+				.hasNotProperty(0, user.username)
 		;
 	});
 });

@@ -23,13 +23,17 @@ var UserStorage = function(_usersKey) {
 		_updateStorage();
 	}
 
-	var _addAuthenticated = function(username) {
-		_authenticatedUsers.push(username);
+	var _addAuthenticated = function(user) {
+		_authenticatedUsers.push(user.username);
 		_updateStorage();
 	}
 
 	var _getAll = function() {
 		return _userContainer;
+	}
+
+	var _getAllAuthenticated = function() {
+		return _authenticatedUsers;
 	}
 
 	var _hasUser = function(username) {
@@ -52,7 +56,8 @@ var UserStorage = function(_usersKey) {
 		"addAuthenticated": _addAuthenticated,
 		"hasUser": _hasUser,
 		"isAuthenticated": _isAuthenticated,
-		"getAll": _getAll
+		"getAll": _getAll,
+		"getAllAuthenticated": _getAllAuthenticated
 	}
 }
 

@@ -44,7 +44,7 @@ var UserService = function(_userEventBus, _userStorage) {
 				if (elem === user.username && allUsers[elem] === user.password) {
 					
 					_userStorage.addAuthenticated(user);
-					_userEventBus("", events.successfullAuthenticationEvent);
+					_userEventBus.post("", events.successfullAuthenticationEvent);
 
 					return;
 				}
@@ -63,7 +63,8 @@ var UserService = function(_userEventBus, _userStorage) {
 	return {
 		"onUserAdded": _onUserAdded,
 		"onUserAuthenticated": _onUserAuthenticated,
-		"getAll": _userStorage.getAll
+		"getAll": _userStorage.getAll,
+		"getAllAuthenticated": _userStorage.getAllAuthenticated
 	}
 }
 
