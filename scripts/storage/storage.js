@@ -12,6 +12,7 @@ var Storage = function() {
 		if (typeof storage[key] === 'undefined') {
 			storage[key] = [];
 		}
+		//console.log(key + " |" + storage[key]);
 		return storage[key];
 	}
 

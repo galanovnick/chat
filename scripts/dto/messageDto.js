@@ -1,7 +1,8 @@
-var MessageDto = function(username, text) {
+var MessageDto = function(username, text, roomId) {
 	return {
 		"username": username,
-		"text": text
+		"text": text,
+		"roomId": roomId
 	}
 }
 

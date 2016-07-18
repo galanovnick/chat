@@ -5,7 +5,8 @@
   "main": "chat-app.js",
   "directories": {
     "test": "testUserService",
-    "test": "testMessageService"
+    "test": "testMessageService",
+    "test": "testChatService"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

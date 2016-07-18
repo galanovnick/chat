@@ -2,8 +2,11 @@
 
 var ChatApp = function(_rootId) {
 
-	_userEventBus = EventBus();
-	_userService = UserService(_userEventBus, Storage());
+	var _storage = Storage();
+	var _userEventBus = EventBus();
+	var _userService = UserService(_userEventBus, _storage);
+
+	var _session;
 
 	var events = {
 		userAddedEvent : "USER_ADDED_EVENT",
@@ -17,6 +20,7 @@ var ChatApp = function(_rootId) {
 	var _components = {};
 
 	var _init = function() {
+		_session = SessionComponent();
 
 		_components.registrationComponent = RegistrationComponent("reg-" + _rootId);
 		_components.loginComponent = UserLoginComponent("login-" + _rootId);
@@ -26,7 +30,9 @@ var ChatApp = function(_rootId) {
 		_userEventBus.subscribe(events.successfullRegistrationEvent, _components.registrationComponent.onRegistrationSuccess);
 		_userEventBus.subscribe(events.registrationFailedEvent, _components.registrationComponent.onRegistrationFailed);
 		_userEventBus.subscribe(events.authenticationFailedEvent, _components.loginComponent.onUserAuthenticationFailed);
+		_userEventBus.subscribe(events.successfullAuthenticationEvent, _session.onUserAuthenticated);
 		_userEventBus.subscribe(events.successfullAuthenticationEvent, _components.loginComponent.onUserSuccessfullyAuthenticated);
+		_userEventBus.subscribe(events.successfullAuthenticationEvent, _components.registrationComponent.onUserSuccessfullyAuthenticated);
 		_userEventBus.subscribe(events.successfullAuthenticationEvent, _createUserBox);
 
 		Object.keys(_components).forEach(function(key) {
@@ -35,14 +41,9 @@ var ChatApp = function(_rootId) {
 		});
 	}
 
-	var _createUserBox = function(_userName) {
-		if (typeof _components.userBoxes === 'undefined') {
-			_components.userBoxes = [];
-		}
-		var userBox = UserBoxComponent(_userName, EventBus());
-		userBox.init();
-
-		_components.userBoxes.push(userBox);
+	var _createUserBox = function() {
+		_components.userBox = UserBoxComponent("userBox");
+		_components.userBox.init();
 	}
 
 	var RegistrationComponent = function(_componentRootId) {
@@ -100,7 +101,7 @@ var ChatApp = function(_rootId) {
 			$("#" + _componentRootId + " .password_r").val("");
 		}
 
-		var _hide = function() {
+		var _onUserSuccessfullyAuthenticated = function() {
 			$("#" + _componentRootId).remove();
 		}
 
@@ -114,10 +115,10 @@ var ChatApp = function(_rootId) {
 
 		return {
 			"init": _init,
-			"hide": _hide,
 			"register": _register,
 			"onRegistrationSuccess": _onRegistrationSuccess,
-			"onRegistrationFailed": _onRegistrationFailed
+			"onRegistrationFailed": _onRegistrationFailed,
+			"onUserSuccessfullyAuthenticated": _onUserSuccessfullyAuthenticated
 		}
 	}
 
@@ -159,10 +160,7 @@ var ChatApp = function(_rootId) {
 		}
 
 		var _onUserSuccessfullyAuthenticated = function() {
-			$("#" + _componentRootId + " .error").html("");
-
-			$("#" + _componentRootId + " .username").val("");
-			$("#" + _componentRootId + " .password").val("");
+			$("#" + _componentRootId).remove();
 		}
 
 		var _onUserAuthenticationFailed = function(message) {
@@ -176,23 +174,48 @@ var ChatApp = function(_rootId) {
 		}
 	}
 
-	var UserBoxComponent = function(_componentRootId, _userBoxEventBus) {
+	var UserBoxComponent = function(_componentRootId) {
 
 		var events = {
 			createRoomButtonClickedEvent: "CREATE_ROOM_BUTTON_CLICK_EVENT",
 			roomSuccessfullyCreatedEvent: "ROOM_SUCCESSFULLY_CREATED_EVENT",
-			roomCreationFailedEvent: "ROOM_CREATION_FAILED_EVENT"
+			roomCreationFailedEvent: "ROOM_CREATION_FAILED_EVENT",
+			failedRoomJoinEvent: "FAILED_ROOM_JOIN_EVENT",
+			userSuccessfullyJoinedEvent: "USER_SUCCESSFULLY_JOINED_EVENT",
+			joinRoomButtonClickedEvent: "JOIN_ROOM_BUTTON_CLICKED_EVENT"
 		}
+
+		var _chatService = ChatService(_userEventBus ,_storage);
 
 		var roomsCounter = 0;
 
 		var _init = function() {
+			_userEventBus.subscribe(events.createRoomButtonClickedEvent, _chatService.onChatAdded);
+			_userEventBus.subscribe(events.roomSuccessfullyCreatedEvent, _onRoomSuccessfullyCreated);
+			_userEventBus.subscribe(events.roomCreationFailedEvent, _onRoomCreationFailed);
+			_userEventBus.subscribe(events.joinRoomButtonClickedEvent, _chatService.onUserJoined);
+			_userEventBus.subscribe(events.userSuccessfullyJoinedEvent, _onUserSuccessfullyJoined);
+			_userEventBus.subscribe(events.failedRoomJoinEvent, _onRoomCreationFailed);
+
+			_render();
+
+			$("#" + _componentRootId + " .new-room").click(function() {
+				_userEventBus.post($("#" + _componentRootId + " .room-name").val(), events.createRoomButtonClickedEvent);
+			});
+
+			$("#" + _componentRootId + " .join-room").click(function() {
+				_userEventBus.post({username: _session.getUsername(), 
+					title: $("#" + _componentRootId + " .room-name").val()}, events.joinRoomButtonClickedEvent);
+			});
+		}
+
+		var _render = function() {
 			$('<div></div>')
 				.appendTo("#" + _rootId + " .main-content")
 				.addClass('container user-box')
 				.attr("id", _componentRootId)
 					.append($('<font>')
-						.html('User: ' + _componentRootId))
+						.html('User: ' + _session.getUsername()))
 					.append($('<input/>')
 						.attr('type', 'button')
 						.addClass('new-room')
@@ -208,39 +231,27 @@ var ChatApp = function(_rootId) {
 					.append($('<font>')
 						.attr('color', 'red')
 						.addClass('error'));
-
-			_userBoxEventBus.subscribe(events.createRoomButtonClickedEvent, _createChatRoom);
-			_userBoxEventBus.subscribe(events.roomSuccessfullyCreatedEvent, _onRoomSuccessfullyCreated);
-			_userBoxEventBus.subscribe(events.roomCreationFailedEvent, _onRoomCreationFailed);			
-
-			$("#" + _componentRootId + " .new-room").click(function() {
-				var roomId = _componentRootId + roomsCounter++;
-				var newRoomData = {username: _componentRootId, roomName: $("#" + _componentRootId + " .room-name").val(), roomId: roomId};
-				_userBoxEventBus.post(newRoomData, events.createRoomButtonClickedEvent);
-			});
-		}
-
-		var _createChatRoom = function(_roomData) {
-			if (_roomData.roomName === '') {
-				_userBoxEventBus.post("Chat name cannot be empty.", events.roomCreationFailedEvent);
-				return;
-			}
-			if (typeof _components.chatRooms === 'undefined') {
-				_components.chatRooms = [];
-			}
-			var room = ChatRoomComponent(_roomData);
-			room.init();
-
-			_components.chatRooms.push(room);
-
-			_userBoxEventBus.post("", events.roomSuccessfullyCreatedEvent);
 		}
 
 		var _onRoomCreationFailed = function(message) {
 			$("#" + _componentRootId + " .error").html(message);
 		}
 
-		var _onRoomSuccessfullyCreated = function() {
+		var _onRoomSuccessfullyCreated = function(_roomTitle) {
+			$("#" + _componentRootId + " .error").html("");
+			$("#" + _componentRootId + " .room-name").val("");
+		}
+
+		var _onUserSuccessfullyJoined = function(roomTittle) {
+			if (typeof _components["rooms"] === 'undefined') {
+				_components["rooms"] = [];
+			}
+
+			var newRoom = ChatRoomComponent(roomTittle);
+			newRoom.init();
+
+			_components.rooms.push(newRoom);
+
 			$("#" + _componentRootId + " .error").html("");
 			$("#" + _componentRootId + " .room-name").val("");
 		}
@@ -250,7 +261,7 @@ var ChatApp = function(_rootId) {
 		}
 	}
 
-	var ChatRoomComponent = function(_roomData) {
+	var ChatRoomComponent = function(_chatName) {
 
 		var chatRoomEvents = {
 			messageAddedEvent: "MESSAGE_ADDED_EVENT",
@@ -258,41 +269,19 @@ var ChatApp = function(_rootId) {
 			messageAdditionFailedEvent: "MESSAGE_ADDITION_FAILED_EVENT",
 			messagesListUpdatedEvent: "MESSAGES_LIST_UPDATED_EVENT"
 		}
-		var _ownerName = _roomData.username;
 
-		var _chatName = _roomData.roomName;
-
-		var _componentRootId = _roomData.roomId;
+		var _componentRootId = _chatName.replace(/ /g,"_");
 
 		var _chatRoomEventBus = EventBus();
 
-		var _messageService = MessageService(_chatRoomEventBus, Storage());
+		var _messageService = MessageService(_chatRoomEventBus, _storage, _componentRootId);
 
 		_chatRoomComponents = {};
 
 		var _chatRoomDomContent;
 
 		var _init = function() {
-			console.log("Trying to initialie chat room with id = '" + _componentRootId + "' and owner = '" + _ownerName + "'...");
-
-			$('<div>' + _chatName + ' | owner: ' + _ownerName + '</div>')
-				.appendTo("#" + _rootId + " .main-content")
-				.addClass('container')
-					.attr('id', _componentRootId)
-						.append($('<div>')
-							.addClass('chat-room-content'));
-
-			/*$("<input/>")
-				.appendTo("#" + _componentRootId)
-					.attr('type', 'button')
-					.val('Invite')
-					.css({width: '60px', height: '30px', 'margin-top': '5px'});
-
-			$("<input/>")
-				.appendTo("#" + _componentRootId)
-					.attr('type', 'text')
-					.attr('placeholder', 'User nickname')
-					.css({width: '100px', height: '20px', 'margin': '5px'});*/
+			_render();
 
 			_chatRoomDomContent = $("#" + _componentRootId + " .chat-room-content");
 
@@ -307,6 +296,15 @@ var ChatApp = function(_rootId) {
 			Object.keys(_chatRoomComponents).forEach(function(key) {
 				_chatRoomComponents[key].init();
 			});
+		}
+
+		var _render = function() {
+			$('<div>' + _chatName + '</div>')
+				.appendTo("#" + _rootId + " .main-content")
+				.addClass('container')
+					.attr('id', _componentRootId)
+						.append($('<div>')
+							.addClass('chat-room-content'));
 		}
 
 		var AddMessageComponent = function() {
@@ -327,7 +325,7 @@ var ChatApp = function(_rootId) {
 						.addClass('error');
 
 				$(_chatRoomDomContent).children(".send-message-btn").click(function() {
-					var message = MessageDto(_ownerName.username, $(_chatRoomDomContent).children(".message-input-box").val());
+					var message = MessageDto(_session.getUsername(), $(_chatRoomDomContent).children(".message-input-box").val());
 
 					_chatRoomEventBus.post(message ,chatRoomEvents.messageAddedEvent);
 				});
@@ -355,11 +353,13 @@ var ChatApp = function(_rootId) {
 				$('<div></div>')
 					.appendTo(_chatRoomDomContent)
 					.addClass('container text-container messages');
+
+				_onMessageListUpdated([]);
 			}
 
 			var _onMessageListUpdated = function(messages) {
 				var messageBox = $(_chatRoomDomContent).children(".messages");
-				messageBox.html("");
+				messageBox.html("<p>Hi " + _session.getUsername() + "!</p>");
 				messages.forEach(function(message) {
 					$('<p>' + message.username + ': ' + message.text + '</p>')
 						.appendTo(messageBox);
@@ -377,6 +377,24 @@ var ChatApp = function(_rootId) {
 
 		return {
 			"init": _init
+		}
+	}
+
+	var SessionComponent = function() {
+
+		var _username;
+
+		var _onUserAuthenticated = function(username) {
+			_username = username;
+		}
+
+		var _getUsername = function() {
+			return _username;
+		}
+
+		return {
+			"onUserAuthenticated": _onUserAuthenticated,
+			"getUsername": _getUsername
 		}
 	}
 
