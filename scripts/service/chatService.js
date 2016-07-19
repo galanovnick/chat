@@ -46,7 +46,7 @@ var ChatService = function(_eventBus, _storage) {
 		return _storage.getItems("chats");
 	}
 
-	var _randomId = function() {
+	var generateRandomId = function() {
 		var result = "";
     	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -57,7 +57,7 @@ var ChatService = function(_eventBus, _storage) {
 		return result;
 	}
 
-	var randomIdPrefix = _randomId();
+	var randomIdPrefix = generateRandomId();
 
 	var _onMessageAdded = function(message) {
 

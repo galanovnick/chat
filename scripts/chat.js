@@ -1,7 +1,3 @@
-//TODO: add dropwdown
-//TODO: join message and chat services ?
-//TODO: remove messageId from message service
-
 var ChatApp = function(_rootId) {
 
 	var _storage = new Storage();
@@ -70,7 +66,7 @@ var ChatApp = function(_rootId) {
 				var password = $("#" + _componentRootId + " .password").val();
 				var password_r = $("#" + _componentRootId + " .password_r").val();
 
-				_register(UserDto(username, password, password_r));				
+				_register(new UserDto(username, password, password_r));				
 			});
 		}
 
@@ -143,7 +139,7 @@ var ChatApp = function(_rootId) {
 				var username = $("#" + _componentRootId + " .username").val();
 				var password = $("#" + _componentRootId + " .password").val();
 
-				_login(UserDto(username, password, ""));				
+				_login(new UserDto(username, password, ""));				
 			});
 		}
 
@@ -260,7 +256,7 @@ var ChatApp = function(_rootId) {
 				_components["rooms"] = [];
 			}
 
-			var newRoom = ChatRoomComponent(roomTittle);
+			var newRoom = new ChatRoomComponent(roomTittle);
 			newRoom.init();
 
 			_components.rooms.push(newRoom);
@@ -326,7 +322,7 @@ var ChatApp = function(_rootId) {
 						.addClass('error');
 
 				$(_chatRoomDomContent).children(".send-message-btn").click(function() {
-					var message = MessageDto($("#u-name").val(), $(_chatRoomDomContent).children(".message-input-box").val(), _componentRootId);
+					var message = new MessageDto($("#u-name").val(), $(_chatRoomDomContent).children(".message-input-box").val(), _componentRootId);
 
 					_eventBus.post(message ,events.messageAddedEvent);
 				});
