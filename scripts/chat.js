@@ -194,7 +194,7 @@ var ChatApp = function(_rootId) {
 
 			$("#" + _componentRootId + " .join-room").click(function() {
 				_eventBus.post({username: $("#u-name").val(), 
-					title: $("#" + _componentRootId + " .room-name").val()}, events.joinRoomButtonClickedEvent);
+					title: $("#" + _componentRootId + " .room-names").val()}, events.joinRoomButtonClickedEvent);
 			});
 		}
 
@@ -210,16 +210,39 @@ var ChatApp = function(_rootId) {
 						.addClass('new-room')
 						.val('New chat'))
 					.append($('<input/>')
-						.attr('type', 'button')
-						.addClass('join-room')
-						.val('Join chat'))
-					.append($('<input/>')
 						.attr('type', 'text')
 						.addClass('room-name')
 						.attr('placeholder', 'Chat name'))
+					.append($('font')
+						.html('Available chat rooms:')
+						.addClass('join-room-elem'))
+					.append($('<select>')
+						.addClass('room-names join-room-elem'))
+					.append($('<input/>')
+						.attr('type', 'button')
+						.addClass('join-room join-room-elem')
+						.val('Join chat'))
 					.append($('<font>')
 						.attr('color', 'red')
 						.addClass('error'));
+			showAvailableRooms();			
+		}
+
+		var showAvailableRooms = function() {
+			var chats = _chatService.getAllRooms();
+			console.log(chats);
+			if (chats.length > 0) {
+				$('#' + _componentRootId + ' .room-names').html('');
+				chats.forEach(function(chatName) {
+					$('<option>')
+						.appendTo('#' + _componentRootId + ' .room-names')
+						.val(chatName)
+						.html(chatName);
+				});
+				$('#' + _componentRootId + ' .join-room-elem').show()
+			} else {
+				$('#' + _componentRootId + ' .join-room-elem').hide()
+			}
 		}
 
 		var _onRoomCreationFailed = function(message) {
@@ -227,6 +250,7 @@ var ChatApp = function(_rootId) {
 		}
 
 		var _onRoomSuccessfullyCreated = function(_roomTitle) {
+			showAvailableRooms();
 			$("#" + _componentRootId + " .error").html("");
 			$("#" + _componentRootId + " .room-name").val("");
 		}
