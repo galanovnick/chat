@@ -1,6 +1,7 @@
 var EventBus = require('../scripts/lib/eventBus');
 var ChatService = require('../scripts/service/chatService');
 var Storage = require('../scripts/storage/storage');
+var MessageDto = require('../scripts/dto/messageDto');
 
 describe("Chat service test-suite", function() {
 	var test = require("unit.js");
@@ -46,6 +47,46 @@ describe("Chat service test-suite", function() {
 			.array(allRooms)
 				.hasLength(1)
 				.hasNotProperty(1, "chat-room")
+		;
+	});
+
+	it("Should add messages", function() {
+
+		var chatService = new ChatService(EventBus(), Storage());
+
+		var message = new MessageDto("Vasya", "Hello world!", "room-id");
+
+		chatService.onMessageAdded(message);
+
+		var allmessages = chatService.getAllMessages("room-id");
+
+		test
+			.array(allmessages)
+				.hasLength(1)
+				.hasProperty(0, message)
+		;
+	});
+
+	it("Should not add empty messages", function() {
+
+		var chatService = new ChatService(EventBus(), Storage());
+
+		var emptyMessage1 = new MessageDto("Vasya", "", "room-id");
+		var emptyMessage2 = new MessageDto("Vasya");
+		var emptyMessage3 = new MessageDto("Vasya", null, "room-id");
+
+		chatService.onMessageAdded(emptyMessage1);
+		chatService.onMessageAdded(emptyMessage2);
+		chatService.onMessageAdded(emptyMessage3);
+
+		var allmessages = chatService.getAllMessages("room-id");
+
+		test
+			.array(allmessages)
+				.hasLength(0)
+				.hasNotProperty(0, emptyMessage1)
+				.hasNotProperty(1, emptyMessage2)
+				.hasNotProperty(2, emptyMessage3)
 		;
 	});
 });

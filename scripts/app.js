@@ -13,7 +13,6 @@ define(function(require) {
 	require("./dto/messageDto");
 	require('./service/userService');
 	require('./service/chatService')
-	require('./service/messageService');
 	require('./chat');
 	require('./lib/eventBus');
 

@@ -8,11 +8,16 @@ var events = {
 
 	messageAdditionFailedEvent: "MESSAGE_ADDITION_FAILED_EVENT",
 	messageSuccessfullyAddedEvent: "MESSAGE_SUCCESSFULLY_ADDED_EVENT",
+	messageAddedEvent: "MESSAGE_ADDED_EVENT",
+	messagesListUpdatedEvent: "MESSAGES_LIST_UPDATED_EVENT",
 
 	roomSuccessfullyCreatedEvent: "ROOM_SUCCESSFULLY_CREATED_EVENT",
 	roomCreationFailedEvent: "ROOM_CREATION_FAILED_EVENT",
 	failedRoomJoinEvent: "FAILED_ROOM_JOIN_EVENT",
-	userSuccessfullyJoinedEvent: "USER_SUCCESSFULLY_JOINED_EVENT"
+	userSuccessfullyJoinedEvent: "USER_SUCCESSFULLY_JOINED_EVENT",
+
+	createRoomButtonClickedEvent: "CREATE_ROOM_BUTTON_CLICK_EVENT",
+	joinRoomButtonClickedEvent: "JOIN_ROOM_BUTTON_CLICKED_EVENT"
 }
 
 if (typeof define !== 'function') {
