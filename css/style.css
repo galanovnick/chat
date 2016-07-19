@@ -61,3 +61,7 @@ textarea {
 	padding-top: 3px;
 	padding-bottom: 3px;
 }
+
+.leave-room {
+	float: right;
+}

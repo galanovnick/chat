@@ -195,6 +195,7 @@ var ChatApp = function(_rootId) {
 			_eventBus.subscribe(events.joinRoomButtonClickedEvent, _chatService.onUserJoined);
 			_eventBus.subscribe(events.userSuccessfullyJoinedEvent, _onUserSuccessfullyJoined);
 			_eventBus.subscribe(events.failedRoomJoinEvent, _onRoomCreationFailed);
+			_eventBus.subscribe(events.leaveRommButtonClickedEvent, _chatService.onUserLeft);
 
 			_render();
 
@@ -223,7 +224,7 @@ var ChatApp = function(_rootId) {
 						.attr('type', 'text')
 						.addClass('room-name')
 						.attr('placeholder', 'Chat name'))
-					.append($('font')
+					.append($('<font>')
 						.html('Available chat rooms:')
 						.addClass('join-room-elem'))
 					.append($('<select>')
@@ -232,6 +233,7 @@ var ChatApp = function(_rootId) {
 						.attr('type', 'button')
 						.addClass('join-room join-room-elem')
 						.val('Join chat'))
+						.append($('</br>'))
 					.append($('<font>')
 						.attr('color', 'red')
 						.addClass('error'));
@@ -295,14 +297,13 @@ var ChatApp = function(_rootId) {
 		var _init = function() {
 			_render();
 
-			_chatRoomDomContent = $("#" + _componentRootId + " .chat-room-content");
-
 			_chatRoomComponents.messageListComponent = new MessageListComponent();
 			_chatRoomComponents.addMessageComponent = new AddMessageComponent();
 
 			_eventBus.subscribe(events.messageSuccessfullyAddedEvent, _chatRoomComponents.addMessageComponent.onMessageSuccessfullyAdded);
 			_eventBus.subscribe(events.messageAdditionFailedEvent, _chatRoomComponents.addMessageComponent.onMessageAdditionFailed);
 			_eventBus.subscribe(events.messageSuccessfullyAddedEvent, _chatRoomComponents.messageListComponent.onMessageListUpdated);
+			_eventBus.subscribe(events.userSuccessfullyLeftEvent, _onUserLeft);
 
 			Object.keys(_chatRoomComponents).forEach(function(key) {
 				_chatRoomComponents[key].init();
@@ -310,12 +311,29 @@ var ChatApp = function(_rootId) {
 		}
 
 		var _render = function() {
-			$('<div>' + _chatName + '</div>')
+			$('<div>')
+				.html(_chatName)
 				.appendTo("#" + _rootId + " .main-content")
 				.addClass('container')
-					.attr('id', _componentRootId)
-						.append($('<div>')
-							.addClass('chat-room-content'));
+				.attr('id', _componentRootId)
+					.append($('<input>')
+						.attr('type', 'button')
+						.addClass('leave-room')
+						.val('Leave chat'))
+					.append($('<div>')
+						.addClass('chat-room-content'));
+
+			_chatRoomDomContent = $('#' + _componentRootId + ' .chat-room-content');
+
+			$('#' + _componentRootId + ' .leave-room').click(function() {
+				_eventBus.post({roomId: _componentRootId, username: $('#u-name').val()}, events.leaveRommButtonClickedEvent);
+			});
+		}
+
+		var _onUserLeft = function(roomId) {
+			if (roomId === _componentRootId) {
+				$('#' + _componentRootId).remove();
+			}
 		}
 
 		var AddMessageComponent = function() {
@@ -328,7 +346,7 @@ var ChatApp = function(_rootId) {
 				$('<input/>')
 					.appendTo(_chatRoomDomContent)
 						.attr('type', 'button')
-						.attr('value', 'Send')
+						.attr('value', 'Send message')
 						.addClass('send-message-btn');
 				$('<font>')
 					.appendTo(_chatRoomDomContent)
@@ -369,7 +387,7 @@ var ChatApp = function(_rootId) {
 					.appendTo(_chatRoomDomContent)
 					.addClass('container text-container messages');
 
-				_onMessageListUpdated({roomId: _componentRootId, messages:[]});
+				_onMessageListUpdated({roomId: _componentRootId, messages: _chatService.getAllMessages(_componentRootId)});
 			}
 
 			var _onMessageListUpdated = function(roomMessages) {

@@ -4,6 +4,17 @@ if (typeof define !== 'function') {
 
 var ChatService = function(_eventBus, _storage) {
 
+	var generateRandomId = function() {
+		var result = "";
+    	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	    for( var i=0; i < 10; i++ ) {
+	        result += possible.charAt(Math.floor(Math.random() * possible.length));
+	    }
+
+		return result;
+	}
+
 	var _registerRoom = function(chatRoomTitle) {
 		if (chatRoomTitle === '') {
 			_eventBus.post("Chat name cannot be empty.", events.roomCreationFailedEvent);
@@ -16,6 +27,8 @@ var ChatService = function(_eventBus, _storage) {
 		}
 	}
 
+	var randomIdChatPrefix = generateRandomId();
+	
 	var _onUserJoined = function(userRequestData) {
 		var chatRoomTitle = userRequestData.title;
 		if (chatRoomTitle === '') {
@@ -25,10 +38,14 @@ var ChatService = function(_eventBus, _storage) {
 		} else if(isUserJoined(userRequestData.username, chatRoomTitle)) {
 			_eventBus.post("You cannot join chat room '" + chatRoomTitle + "' twice.", events.failedRoomJoinEvent);
 		} else {
-
-			_storage.addItem(chatRoomTitle, userRequestData.username)
+			_storage.addItem(randomIdChatPrefix + chatRoomTitle, userRequestData.username)
 			_eventBus.post(chatRoomTitle, events.userSuccessfullyJoinedEvent);
 		}
+	}
+
+	var _onUserLeft = function(userRoomInfo) {
+		_storage.removeItem(randomIdChatPrefix + userRoomInfo.roomId, userRoomInfo.username);
+		_eventBus.post(userRoomInfo.roomId, events.userSuccessfullyLeftEvent);
 	}
 
 	var isChatExists = function(chatRoomTitle) {
@@ -37,7 +54,7 @@ var ChatService = function(_eventBus, _storage) {
 	}
 
 	var isUserJoined = function(username, chatRoomTitle) {
-		var usersInChat = _storage.getItems(chatRoomTitle);
+		var usersInChat = _storage.getItems(randomIdChatPrefix + chatRoomTitle);
 
 		return usersInChat.indexOf(username) > -1;
 	}
@@ -46,18 +63,7 @@ var ChatService = function(_eventBus, _storage) {
 		return _storage.getItems("chats");
 	}
 
-	var generateRandomId = function() {
-		var result = "";
-    	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-	    for( var i=0; i < 10; i++ ) {
-	        result += possible.charAt(Math.floor(Math.random() * possible.length));
-	    }
-
-		return result;
-	}
-
-	var randomIdPrefix = generateRandomId();
+	var randomIdMessagePrefix = generateRandomId();
 
 	var _onMessageAdded = function(message) {
 
@@ -65,14 +71,14 @@ var ChatService = function(_eventBus, _storage) {
 
 			_eventBus.post({roomId: message.roomId, text: "Message text cannot be empty."}, events.messageAdditionFailedEvent);
 		} else {
-			_storage.addItem(randomIdPrefix + message.roomId, message);
+			_storage.addItem(randomIdMessagePrefix + message.roomId, message);
 
-			_eventBus.post({roomId: message.roomId, messages: _storage.getItems(randomIdPrefix + message.roomId)}, events.messageSuccessfullyAddedEvent);
+			_eventBus.post({roomId: message.roomId, messages: _storage.getItems(randomIdMessagePrefix + message.roomId)}, events.messageSuccessfullyAddedEvent);
 		}
 	}
 
 	var _getAllMessages = function(roomId) {
-		return _storage.getItems(randomIdPrefix + roomId);
+		return _storage.getItems(randomIdMessagePrefix + roomId);
 	}
 
 	return {
@@ -80,7 +86,8 @@ var ChatService = function(_eventBus, _storage) {
 		"getAllRooms": _getAllRooms,
 		"onUserJoined": _onUserJoined,
 		"onMessageAdded": _onMessageAdded,
-		"getAllMessages": _getAllMessages
+		"getAllMessages": _getAllMessages,
+		"onUserLeft": _onUserLeft
 	}
 }
 

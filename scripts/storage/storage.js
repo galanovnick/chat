@@ -16,8 +16,14 @@ var Storage = function() {
 		return storage[key];
 	}
 
+	var _removeItem = function(key, value) {
+		var roomUsers = storage[key];
+		roomUsers.splice(roomUsers.indexOf(value), 1);
+	}
+
 	return {
 		"addItem": _addItem,
+		"removeItem": _removeItem,
 		"getItems": _getItems
 	}
 }
