@@ -28,7 +28,7 @@ var ChatService = function(_eventBus, _storage) {
 	}
 
 	var randomIdChatPrefix = generateRandomId();
-	
+
 	var _onUserJoined = function(userRequestData) {
 		var chatRoomTitle = userRequestData.title;
 		if (chatRoomTitle === '') {
@@ -70,6 +70,8 @@ var ChatService = function(_eventBus, _storage) {
 		if (typeof message.text === 'undefined' || message.text === null || message.text === "") {
 
 			_eventBus.post({roomId: message.roomId, text: "Message text cannot be empty."}, events.messageAdditionFailedEvent);
+		} else if(!isUserJoined(message.username, message.roomId)) {
+			_eventBus.post({roomId: message.roomId, text: "User '" + message.username + "' not in this chat."}, events.messageAdditionFailedEvent);
 		} else {
 			_storage.addItem(randomIdMessagePrefix + message.roomId, message);
 

@@ -53,6 +53,8 @@ describe("Chat service test-suite", function() {
 	it("Should add messages", function() {
 
 		var chatService = new ChatService(new EventBus(), new Storage());
+		chatService.onChatAdded("room-id");
+		chatService.onUserJoined({username: "Vasya", title: "room-id"});
 
 		var message = new MessageDto("Vasya", "Hello world!", "room-id");
 
@@ -67,9 +69,29 @@ describe("Chat service test-suite", function() {
 		;
 	});
 
+	it("Should not add message from user that is not in chat", function() {
+
+		var chatService = new ChatService(new EventBus(), new Storage());
+		chatService.onChatAdded("room-id");
+
+		var message = new MessageDto("Vasya", "Hello world!", "room-id");
+
+		chatService.onMessageAdded(message);
+
+		var allmessages = chatService.getAllMessages("room-id");
+
+		test
+			.array(allmessages)
+				.hasLength(0)
+				.hasNotProperty(0, message)
+		;
+	});
+
 	it("Should not add empty messages", function() {
 
 		var chatService = new ChatService(new EventBus(), new Storage());
+		chatService.onChatAdded("room-id");
+		chatService.onUserJoined({username: "Vasya", title: "room-id"});
 
 		var emptyMessage1 = new MessageDto("Vasya", "", "room-id");
 		var emptyMessage2 = new MessageDto("Vasya");
