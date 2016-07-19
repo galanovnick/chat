@@ -200,12 +200,12 @@ var ChatApp = function(_rootId) {
 			_render();
 
 			$("#" + _componentRootId + " .new-room").click(function() {
-				_eventBus.post($("#" + _componentRootId + " .room-name").val(), events.createRoomButtonClickedEvent);
+				_eventBus.post(new RoomDto($("#" + _componentRootId + " .room-name").val().replace(/ /g,"_")), events.createRoomButtonClickedEvent);
 			});
 
 			$("#" + _componentRootId + " .join-room").click(function() {
 				_eventBus.post({username: $("#u-name").val(), 
-					title: $("#" + _componentRootId + " .room-names").val()}, events.joinRoomButtonClickedEvent);
+					title: $("#" + _componentRootId + " .room-names").val().replace(/ /g,"_")}, events.joinRoomButtonClickedEvent);
 			});
 		}
 
@@ -242,14 +242,13 @@ var ChatApp = function(_rootId) {
 
 		var showAvailableRooms = function() {
 			var chats = _chatService.getAllRooms();
-			console.log(chats);
 			if (chats.length > 0) {
 				$('#' + _componentRootId + ' .room-names').html('');
-				chats.forEach(function(chatName) {
+				chats.forEach(function(chat) {
 					$('<option>')
 						.appendTo('#' + _componentRootId + ' .room-names')
-						.val(chatName)
-						.html(chatName);
+						.val(chat.title)
+						.html(chat.title);
 				});
 				$('#' + _componentRootId + ' .join-room-elem').show()
 			} else {
@@ -288,7 +287,7 @@ var ChatApp = function(_rootId) {
 
 	var ChatRoomComponent = function(_chatName) {
 
-		var _componentRootId = _chatName.replace(/ /g,"_");
+		var _componentRootId = _chatName;
 
 		_chatRoomComponents = {};
 

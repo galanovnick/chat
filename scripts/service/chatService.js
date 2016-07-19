@@ -15,15 +15,15 @@ var ChatService = function(_eventBus, _storage) {
 		return result;
 	}
 
-	var _registerRoom = function(chatRoomTitle) {
-		if (chatRoomTitle === '') {
+	var _createRoom = function(chatRoom) {
+		if (chatRoom.title === '') {
 			_eventBus.post("Chat name cannot be empty.", events.roomCreationFailedEvent);
-		} else if(isChatExists(chatRoomTitle)) {
+		} else if(isChatExists(chatRoom.title)) {
 			_eventBus.post("Chat with such name already exists.", events.roomCreationFailedEvent);
 		} else {
 
-			_storage.addItem("chats", chatRoomTitle);
-			_eventBus.post(chatRoomTitle, events.roomSuccessfullyCreatedEvent);
+			_storage.addItem("chats", chatRoom);
+			_eventBus.post(chatRoom.title, events.roomSuccessfullyCreatedEvent);
 		}
 	}
 
@@ -50,7 +50,15 @@ var ChatService = function(_eventBus, _storage) {
 
 	var isChatExists = function(chatRoomTitle) {
 		var chats = _storage.getItems("chats");
-		return chats.indexOf(chatRoomTitle) > -1;
+		var isChatExists = false;
+		chats.forEach(function(item) {
+			console.log(item.title + "|" + chatRoomTitle);
+			if (item.title === chatRoomTitle) {
+				isChatExists = true;
+				return;
+			}
+		});
+		return isChatExists;
 	}
 
 	var isUserJoined = function(username, chatRoomTitle) {
@@ -84,7 +92,7 @@ var ChatService = function(_eventBus, _storage) {
 	}
 
 	return {
-		"onChatAdded": _registerRoom,
+		"onChatAdded": _createRoom,
 		"getAllRooms": _getAllRooms,
 		"onUserJoined": _onUserJoined,
 		"onMessageAdded": _onMessageAdded,

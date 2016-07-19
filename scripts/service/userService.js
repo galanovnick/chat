@@ -22,7 +22,7 @@ var UserService = function(_userEventBus, _storage) {
 
 			_storage.addItem("users", {username: user.username, password: user.password});
 
-			_userEventBus.post("", events.successfulRegistrationEvent);
+			_userEventBus.post(user.username, events.successfulRegistrationEvent);
 		}
 	}
 

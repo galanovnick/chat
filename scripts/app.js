@@ -11,6 +11,7 @@ define(function(require) {
 	require("./storage/storage")
 	require("./dto/userDto");
 	require("./dto/messageDto");
+	require("./dto/roomDto");
 	require('./service/userService');
 	require('./service/chatService')
 	require('./chat');
