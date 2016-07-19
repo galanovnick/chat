@@ -20,8 +20,8 @@ describe("Chat service test-suite", function() {
 		var firstRoom = new RoomDto("first-chat-room");
 		var secondRoom = new RoomDto("second-chat-room");
 
-		chatService.onChatAdded(firstRoom);
-		chatService.onChatAdded(secondRoom);
+		chatService.onRoomAdded(firstRoom);
+		chatService.onRoomAdded(secondRoom);
 
 		var allRooms = chatService.getAllRooms();
 
@@ -51,7 +51,7 @@ describe("Chat service test-suite", function() {
 
 		var chatService = new ChatService(eb, new Storage());
 
-		chatService.onChatAdded(new RoomDto(""));
+		chatService.onRoomAdded(new RoomDto(""));
 
 		var allRooms = chatService.getAllRooms();
 
@@ -76,8 +76,8 @@ describe("Chat service test-suite", function() {
 
 		var chatService = new ChatService(eb, new Storage());
 
-		chatService.onChatAdded(new RoomDto("chat-room"));
-		chatService.onChatAdded(new RoomDto("chat-room"));
+		chatService.onRoomAdded(new RoomDto("chat-room"));
+		chatService.onRoomAdded(new RoomDto("chat-room"));
 
 		var allRooms = chatService.getAllRooms();
 
@@ -101,7 +101,7 @@ describe("Chat service test-suite", function() {
 		});
 
 		var chatService = new ChatService(eb, new Storage());
-		chatService.onChatAdded(new RoomDto("room-id"));
+		chatService.onRoomAdded(new RoomDto("room-id"));
 		chatService.onUserJoined({username: "Vasya", title: "room-id"});
 
 		var message1 = new MessageDto("Vasya", "Hello world!", "room-id");
@@ -137,7 +137,7 @@ describe("Chat service test-suite", function() {
 		});
 
 		var chatService = new ChatService(eb, new Storage());
-		chatService.onChatAdded("room-id");
+		chatService.onRoomAdded("room-id");
 
 		var message = new MessageDto("Vasya", "Hello world!", "room-id");
 
@@ -165,7 +165,7 @@ describe("Chat service test-suite", function() {
 		});
 
 		var chatService = new ChatService(eb, new Storage());
-		chatService.onChatAdded("room-id");
+		chatService.onRoomAdded("room-id");
 		chatService.onUserJoined({username: "Vasya", title: "room-id"});
 
 		var emptyMessage1 = new MessageDto("Vasya", "", "room-id");

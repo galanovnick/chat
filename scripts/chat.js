@@ -189,7 +189,7 @@ var ChatApp = function(_rootId) {
 
 		var _init = function() {
 			_eventBus.subscribe(events.messageAddedEvent, _chatService.onMessageAdded);
-			_eventBus.subscribe(events.createRoomButtonClickedEvent, _chatService.onChatAdded);
+			_eventBus.subscribe(events.createRoomButtonClickedEvent, _chatService.onRoomAdded);
 			_eventBus.subscribe(events.roomSuccessfullyCreatedEvent, _onRoomSuccessfullyCreated);
 			_eventBus.subscribe(events.roomCreationFailedEvent, _onRoomCreationFailed);
 			_eventBus.subscribe(events.joinRoomButtonClickedEvent, _chatService.onUserJoined);

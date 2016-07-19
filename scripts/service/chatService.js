@@ -92,7 +92,7 @@ var ChatService = function(_eventBus, _storage) {
 	}
 
 	return {
-		"onChatAdded": _createRoom,
+		"onRoomAdded": _createRoom,
 		"getAllRooms": _getAllRooms,
 		"onUserJoined": _onUserJoined,
 		"onMessageAdded": _onMessageAdded,
