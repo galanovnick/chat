@@ -8,9 +8,9 @@ describe("Message service test-suite", function() {
 
 	it("Should add messages", function() {
 
-		var messageService = MessageService(EventBus(), Storage());
+		var messageService = new MessageService(new EventBus(), new Storage());
 
-		var message = MessageDto("Vasya", "Hello world!", "room-id");
+		var message = new MessageDto("Vasya", "Hello world!", "room-id");
 
 		messageService.onMessageAdded(message);
 
@@ -25,11 +25,11 @@ describe("Message service test-suite", function() {
 
 	it("Should not add empty messages", function() {
 
-		var messageService = MessageService(EventBus(), Storage());
+		var messageService = new MessageService(new EventBus(), new Storage());
 
-		var emptyMessage1 = MessageDto("Vasya", "", "room-id");
-		var emptyMessage2 = MessageDto("Vasya");
-		var emptyMessage3 = MessageDto("Vasya", null, "room-id");
+		var emptyMessage1 = new MessageDto("Vasya", "", "room-id");
+		var emptyMessage2 = new MessageDto("Vasya");
+		var emptyMessage3 = new MessageDto("Vasya", null, "room-id");
 
 		messageService.onMessageAdded(emptyMessage1);
 		messageService.onMessageAdded(emptyMessage2);

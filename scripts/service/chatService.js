@@ -1,11 +1,8 @@
-var ChatService = function(_eventBus, _storage) {
+if (typeof define !== 'function') {
+	events = require('../events');
+}
 
-	var events = {
-		roomSuccessfullyCreatedEvent: "ROOM_SUCCESSFULLY_CREATED_EVENT",
-		roomCreationFailedEvent: "ROOM_CREATION_FAILED_EVENT",
-		failedRoomJoinEvent: "FAILED_ROOM_JOIN_EVENT",
-		userSuccessfullyJoinedEvent: "USER_SUCCESSFULLY_JOINED_EVENT"
-	}
+var ChatService = function(_eventBus, _storage) {
 
 	var _registerRoom = function(chatRoomTitle) {
 		if (chatRoomTitle === '') {

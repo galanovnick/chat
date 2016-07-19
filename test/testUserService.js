@@ -9,8 +9,8 @@ describe("User service test-suite", function() {
 
 	it("Should create users", function() {
 
-		var userService = UserService(EventBus(), Storage());
-		var firstUser = UserDto("vasya", "qwerty", "qwerty");
+		var userService = new UserService(new EventBus(), new Storage());
+		var firstUser = new UserDto("vasya", "qwerty", "qwerty");
 
 		userService.onUserAdded(firstUser);
 
@@ -25,10 +25,10 @@ describe("User service test-suite", function() {
 	});
 
 	it("Should not create users with duplicate names", function() {
-		var userService = UserService(EventBus(), Storage());
-		var firstUser = UserDto("vasya", "qwerty", "qwerty");
+		var userService = new UserService(new EventBus(), new Storage());
+		var firstUser = new UserDto("vasya", "qwerty", "qwerty");
 
-		var duplicatedFirstUser = UserDto("vasya", "555", "555");
+		var duplicatedFirstUser = new UserDto("vasya", "555", "555");
 
 		userService.onUserAdded(firstUser);
 		userService.onUserAdded(duplicatedFirstUser);
@@ -42,8 +42,8 @@ describe("User service test-suite", function() {
 	});
 
 	it("Should not create users with different passwords", function() {
-		var userService = UserService(EventBus(), Storage());
-		var userWithDifferentPasswords = UserDto("masha", "123", "132");
+		var userService = new UserService(new EventBus(), new Storage());
+		var userWithDifferentPasswords = new UserDto("masha", "123", "132");
 
 		userService.onUserAdded(userWithDifferentPasswords);
 
@@ -56,8 +56,8 @@ describe("User service test-suite", function() {
 	});
 
 	it("Should not create users with empty name", function() {
-		var userService = UserService(EventBus(), Storage());
-		var userWithEmptyFields = UserDto("", "123", "123");
+		var userService = new UserService(new EventBus(), new Storage());
+		var userWithEmptyFields = new UserDto("", "123", "123");
 
 		userService.onUserAdded(userWithEmptyFields);
 
@@ -70,8 +70,8 @@ describe("User service test-suite", function() {
 	});
 
 	it("Should not create users with empty password", function() {
-		var userService = UserService(EventBus(), Storage());
-		var userWithEmptyFields = UserDto("vasya", "", "123");
+		var userService = new UserService(new EventBus(), new Storage());
+		var userWithEmptyFields = new UserDto("vasya", "", "123");
 
 		userService.onUserAdded(userWithEmptyFields);
 
@@ -84,8 +84,8 @@ describe("User service test-suite", function() {
 	});
 
 	it("Should not create users with empty password_r", function() {
-		var userService = UserService(EventBus(), Storage());
-		var userWithEmptyFields = UserDto("vasya", "123", "");
+		var userService = new UserService(new EventBus(), new Storage());
+		var userWithEmptyFields = new UserDto("vasya", "123", "");
 
 		userService.onUserAdded(userWithEmptyFields);
 

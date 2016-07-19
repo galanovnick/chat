@@ -7,6 +7,7 @@ requirejs.config({
 
 define(function(require) {
 
+	require("./events");
 	require("./storage/storage")
 	require("./dto/userDto");
 	require("./dto/messageDto");
@@ -16,6 +17,6 @@ define(function(require) {
 	require('./chat');
 	require('./lib/eventBus');
 
-	var chat = ChatApp("chat-container").init();
+	var chat = new ChatApp("chat-container").init();
 
 });		

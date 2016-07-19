@@ -1,9 +1,8 @@
-var MessageService = function(_eventBus, _storage, _roomId) {
+if (typeof define !== 'function') {
+	events = require('../events');
+}
 
-	var events = {
-		messageAdditionFailedEvent: "MESSAGE_ADDITION_FAILED_EVENT",
-		messageSuccessfullyAddedEvent: "MESSAGE_SUCCESSFULLY_ADDED_EVENT"
-	}
+var MessageService = function(_eventBus, _storage, _roomId) {
 
 	var _onMessageAdded = function(message) {
 

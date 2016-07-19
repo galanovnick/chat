@@ -7,7 +7,7 @@ describe("Chat service test-suite", function() {
 
 	it("Should create chat room", function() {
 
-		var chatService = ChatService(EventBus(), Storage());
+		var chatService = new ChatService(EventBus(), Storage());
 
 		chatService.onChatAdded("chat-room");
 
@@ -22,7 +22,7 @@ describe("Chat service test-suite", function() {
 
 	it("Should not create chat room with empty title", function() {
 
-		var chatService = ChatService(EventBus(), Storage());
+		var chatService = new ChatService(EventBus(), Storage());
 
 		chatService.onChatAdded("");
 
@@ -35,7 +35,7 @@ describe("Chat service test-suite", function() {
 
 	it("Should not create chat rooms with duplicated titles", function() {
 
-		var chatService = ChatService(EventBus(), Storage());
+		var chatService = new ChatService(EventBus(), Storage());
 
 		chatService.onChatAdded("chat-room");
 		chatService.onChatAdded("chat-room");

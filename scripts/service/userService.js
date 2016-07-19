@@ -1,13 +1,8 @@
-var UserService = function(_userEventBus, _storage) {
+if (typeof define !== 'function') {
+	events = require('../events');
+}
 
-	var events = {
-		userAddedEvent : "USER_ADDED_EVENT",
-		userListUpdatedEvent: "USER_LIST_UPDATED_EVENT",
-		registrationFailedEvent : "REGISTRATION_FAILED_EVENT",
-		successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT",
-		authenticationFailedEvent: "AUTHENTICATION_FAILED_EVENT",
-		successfullAuthenticationEvent: "SUCCESSFUL_AUTHENTICATION_EVENT"
-	}
+var UserService = function(_userEventBus, _storage) {
 
 	var _create = function(user) {
 		console.log("Trying to create user: " + user.username);
