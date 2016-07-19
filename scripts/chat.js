@@ -15,12 +15,12 @@ var ChatApp = function(_rootId) {
 
 		_eventBus.subscribe(events.userAddedEvent, _userService.onUserAdded);
 		_eventBus.subscribe(events.userAuthenticatedEvent, _userService.onUserAuthenticated);
-		_eventBus.subscribe(events.successfullRegistrationEvent, _components.registrationComponent.onRegistrationSuccess);
+		_eventBus.subscribe(events.successfulRegistrationEvent, _components.registrationComponent.onRegistrationSuccess);
 		_eventBus.subscribe(events.registrationFailedEvent, _components.registrationComponent.onRegistrationFailed);
 		_eventBus.subscribe(events.authenticationFailedEvent, _components.loginComponent.onUserAuthenticationFailed);
-		_eventBus.subscribe(events.successfullAuthenticationEvent, _components.loginComponent.onUserSuccessfullyAuthenticated);
-		_eventBus.subscribe(events.successfullAuthenticationEvent, _components.registrationComponent.onUserSuccessfullyAuthenticated);
-		_eventBus.subscribe(events.successfullAuthenticationEvent, _createUserBox);
+		_eventBus.subscribe(events.successfulAuthenticationEvent, _components.loginComponent.onUserSuccessfullyAuthenticated);
+		_eventBus.subscribe(events.successfulAuthenticationEvent, _components.registrationComponent.onUserSuccessfullyAuthenticated);
+		_eventBus.subscribe(events.successfulAuthenticationEvent, _createUserBox);
 
 		Object.keys(_components).forEach(function(key) {
 
@@ -37,29 +37,38 @@ var ChatApp = function(_rootId) {
 
 		var _init = function() {
 			$('<div>')
-				.html('Registration')
+				.html('Registration</br>')
 				.addClass('container')
 				.appendTo('#' + _rootId + " .login-reg")
 					.attr('id', _componentRootId)
 						.append($('<input/>')
+							.append($('<br/>'))
 							.attr('type', 'text')
 							.attr('placeholder', 'Username')
 							.addClass('username'))
 						.append($('<input/>')
+							.append($('<br/>'))
 							.attr('type', 'password')
 							.attr('placeholder', 'Password')
 							.addClass('password'))
 						.append($('<input/>')
+							.append($('<br/>'))
 							.attr('type', 'password')
 							.attr('placeholder', 'Repeate password')
 							.addClass('password_r'))
+							.append($('<br/>'))
 						.append($('<input/>')
 							.attr('type', 'button')
 							.val('Register')
 							.addClass('register'))
 						.append($('<font>')
+							.append($('<br/>'))
 							.addClass('error')
-							.attr('color', 'red'));
+							.attr('color', 'red'))
+						.append($('<font>')
+							.append($('<br/>'))
+							.addClass('success')
+							.attr('color', 'light-blue'));
 
 			$("#" + _componentRootId + " .register").click(function() {
 				var username = $("#" + _componentRootId + " .username").val();
@@ -94,10 +103,12 @@ var ChatApp = function(_rootId) {
 
 		var _onRegistrationFailed = function(message) {
 			_registrationFailed(message);
+			$("#" + _componentRootId + " .success").html("");
 		}
 
 		var _onRegistrationSuccess = function() {
 			_resetFields();
+			$("#" + _componentRootId + " .success").html("User has been registered");
 		}
 
 		return {
@@ -119,14 +130,18 @@ var ChatApp = function(_rootId) {
 				.appendTo('#' + _rootId + " .login-reg")
 					.attr('id', _componentRootId)
 						.append($('<input/>')
+							.append($('<br/>'))
 							.attr('type', 'text')
 							.attr('placeholder', 'Username')
 							.addClass('username'))
 						.append($('<input/>')
+							.append($('<br/>'))
 							.attr('type', 'password')
 							.attr('placeholder', 'Password')
 							.addClass('password'))
-						.append($('</br><input/>')
+							.append($('<br/>'))	
+						.append($('<input/>')
+							.append($('<br/>'))
 							.attr('type', 'button')
 							.val('Login')
 							.addClass('login'))
@@ -167,6 +182,7 @@ var ChatApp = function(_rootId) {
 		}
 	}
 
+	
 	var UserBoxComponent = function(_componentRootId) {
 
 		_chatService = new ChatService(_eventBus, _storage);
@@ -221,7 +237,7 @@ var ChatApp = function(_rootId) {
 					.append($('<font>')
 						.attr('color', 'red')
 						.addClass('error'));
-			showAvailableRooms();			
+			showAvailableRooms();
 		}
 
 		var showAvailableRooms = function() {

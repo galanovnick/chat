@@ -1,10 +1,10 @@
 var events = {
 	userAddedEvent : "USER_ADDED_EVENT",
 	registrationFailedEvent : "REGISTRATION_FAILED_EVENT",
-	successfullRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT",
+	successfulRegistrationEvent: "SUCCESSFUL_REGISTRATION_EVENT",
 	userAuthenticatedEvent: "USER_AUTHENTICATED_EVENT",
 	authenticationFailedEvent: "AUTHENTICATION_FAILED_EVENT",
-	successfullAuthenticationEvent: "SUCCESSFUL_AUTHENTICATION_EVENT",
+	successfulAuthenticationEvent: "SUCCESSFUL_AUTHENTICATION_EVENT",
 
 	messageAdditionFailedEvent: "MESSAGE_ADDITION_FAILED_EVENT",
 	messageSuccessfullyAddedEvent: "MESSAGE_SUCCESSFULLY_ADDED_EVENT",

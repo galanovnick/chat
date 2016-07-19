@@ -22,7 +22,7 @@ var UserService = function(_userEventBus, _storage) {
 
 			_storage.addItem("users", {username: user.username, password: user.password});
 
-			_userEventBus.post("", events.successfullRegistrationEvent);
+			_userEventBus.post("", events.successfulRegistrationEvent);
 		}
 	}
 
@@ -32,7 +32,7 @@ var UserService = function(_userEventBus, _storage) {
 		} else {
 			if (userExists(user)) {
 
-				_userEventBus.post(user.username, events.successfullAuthenticationEvent);
+				_userEventBus.post(user.username, events.successfulAuthenticationEvent);
 
 				return;
 			}
