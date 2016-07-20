@@ -3,7 +3,11 @@
 	<input type="text" class="room-name" placeholder="Chat name"/>
 	<input type="button" class="new-room" value="Create chat"/>
 	<font class="join-room-elem">Available chat rooms</font>
-	<select class="join-room-elem room-names"></select>
+	<select class="join-room-elem room-names">
+		{{#chats}}
+			<option value="{{title}}">{{title}}</option>
+		{{/chats}}
+	</select>
 	<input type="button" class="join-room-elem join-room" value="Join chat"/>
 	<font color="red" class="error"></font>
 </div>

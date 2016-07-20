@@ -52,7 +52,6 @@ var ChatService = function(_eventBus, _storage) {
 		var chats = _storage.getItems("chats");
 		var isChatExists = false;
 		chats.forEach(function(item) {
-			console.log(item.title + "|" + chatRoomTitle);
 			if (item.title === chatRoomTitle) {
 				isChatExists = true;
 				return;

@@ -26,7 +26,6 @@ var ChatApp = function(_rootId) {
 		_eventBus.subscribe(events.successfulAuthenticationEvent, _createUserMenu);
 
 		Object.keys(_components).forEach(function(key) {
-
 			_components[key].init();
 		});
 	}

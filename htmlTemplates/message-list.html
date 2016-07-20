@@ -1,1 +1,4 @@
-<div class="container text-container messages"></div>
+<p>Hi {{ uName }}!</p>
+{{ #messages }}
+	<p class="message-text">{{ username }}: {{ text }}</p>
+{{ /messages }}

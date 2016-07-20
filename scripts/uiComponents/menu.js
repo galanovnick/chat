@@ -1,9 +1,11 @@
 var UserMenuComponent = function(_componentRootId, _rootId, _eventBus, _storage) {
 
 	$.Mustache.addFromDom('user-menu-template');
+	$.Mustache.addFromDom('chat-list-template');
 	$.Mustache.addFromDom('chat-room-template');
 	$.Mustache.addFromDom('add-message-template');
 	$.Mustache.addFromDom('message-list-template');
+	$.Mustache.add('message-list-div', '<div class="container text-container messages"></div>');
 
 	_chatService = new ChatService(_eventBus, _storage);
 
@@ -19,8 +21,7 @@ var UserMenuComponent = function(_componentRootId, _rootId, _eventBus, _storage)
 		_eventBus.subscribe(events.failedRoomJoinEvent, _onRoomCreationFailed);
 		_eventBus.subscribe(events.leaveRommButtonClickedEvent, _chatService.onUserLeft);
 
-		$('#' + _rootId + " .main-content").mustache('user-menu-template', {id: _componentRootId, username: $("#u-name").val()});
-		showAvailableRooms();
+		_render();
 
 		$("#" + _componentRootId + " .new-room").click(function() {
 			_eventBus.post(new RoomDto($("#" + _componentRootId + " .room-name").val().replace(/ /g,"_")), events.createRoomButtonClickedEvent);
@@ -32,19 +33,18 @@ var UserMenuComponent = function(_componentRootId, _rootId, _eventBus, _storage)
 		});
 	}
 
-	var showAvailableRooms = function() {
+	var _render = function() {
 		var chats = _chatService.getAllRooms();
-		if (chats.length > 0) {
-			$('#' + _componentRootId + ' .room-names').html('');
-			chats.forEach(function(chat) {
-				$('<option>')
-					.appendTo('#' + _componentRootId + ' .room-names')
-					.val(chat.title)
-					.html(chat.title);
-			});
-			$('#' + _componentRootId + ' .join-room-elem').show()
-		} else {
-			$('#' + _componentRootId + ' .join-room-elem').hide()
+
+		$('#' + _rootId + " .menu-content").mustache('user-menu-template', 
+			{
+				id: _componentRootId,
+				username: $("#u-name").val(),
+				chats: chats
+			}, {method: 'html'});
+
+		if (chats.length < 1) {
+			$("#" + _componentRootId + " .join-room-elem").hide();
 		}
 	}
 
@@ -53,7 +53,16 @@ var UserMenuComponent = function(_componentRootId, _rootId, _eventBus, _storage)
 	}
 
 	var _onRoomSuccessfullyCreated = function(_roomTitle) {
-		showAvailableRooms();
+		var chats = _chatService.getAllRooms();
+		$("#" + _componentRootId + " .room-names").mustache('chat-list-template', {
+			chats: chats
+		}, {method: 'html'});
+		if (chats.length < 1) {
+			$("#" + _componentRootId + " .join-room-elem").hide();
+		} else {
+			$("#" + _componentRootId + " .join-room-elem").show();
+		}
+
 		$("#" + _componentRootId + " .error").html("");
 		$("#" + _componentRootId + " .room-name").val("");
 	}

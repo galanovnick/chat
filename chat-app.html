@@ -24,10 +24,19 @@
 		<input type="text" class="room-name" placeholder="Chat name"/>
 		<input type="button" class="new-room" value="Create chat"/>
 		<font class="join-room-elem">Available chat rooms</font>
-		<select class="join-room-elem room-names"></select>
+		<select class="join-room-elem room-names">
+			{{#chats}}
+				<option value="{{title}}">{{title}}</option>
+			{{/chats}}
+		</select>
 		<input type="button" class="join-room-elem join-room" value="Join chat"/>
 		<font color="red" class="error"></font>
 	</div>
+</script>
+<script id="chat-list-template" type="text/html">
+	{{#chats}}
+		<option value="{{title}}">{{title}}</option>
+	{{/chats}}
 </script>
 <script id="chat-room-template" type="text/html">
 	<div class="container" id="{{id}}">
@@ -42,7 +51,10 @@
 	<font class="error" color="red"></font>
 </script>
 <script id="message-list-template" type="text/html">
-	<div class="container text-container messages"></div>
+	<p>Hi {{ uName }}!</p>
+	{{ #messages }}
+		<p class="message-text">{{ username }}: {{ text }}</p>
+	{{ /messages }}
 </script>
 <!-- tempaltes for mustache.js -->
 <!DOCTYPE html>
@@ -60,6 +72,8 @@
 <body>
 	<div id="chat-container" class="grid">
 		<div class="col-1-4 login-reg">
+		</div>
+		<div class="col-3-4 menu-content">
 		</div>
 		<div class="col-3-4 main-content">
 		</div>

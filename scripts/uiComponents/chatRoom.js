@@ -74,20 +74,22 @@ var ChatRoomComponent = function(_chatName, _rootId, _eventBus) {
 	var MessageListComponent = function() {
 
 		var _init = function() {
-			_chatRoomDomContent.mustache('message-list-template');
-
-			_onMessageListUpdated({roomId: _componentRootId, messages: _chatService.getAllMessages(_componentRootId)});
+			_chatRoomDomContent.mustache('message-list-div');
+			_chatRoomDomContent.children('.messages').mustache('message-list-template',
+				{
+					uName: $('#u-name').val(),
+					messages: _chatService.getAllMessages(_componentRootId)
+				});
 		}
 
 		var _onMessageListUpdated = function(roomMessages) {
 			if (roomMessages.roomId === _componentRootId) {
 				var messageBox = $(_chatRoomDomContent).children(".messages");
-				messageBox.html("<p>Hi " + $("#u-name").val() + "!</p>");
-				roomMessages.messages.forEach(function(message) {
-					$('<p>' + message.username + ': ' + message.text + '</p>')
-						.addClass('message-text')
-						.appendTo(messageBox);
-				});
+				messageBox.mustache('message-list-template', 
+					{
+						uName: $('#u-name').val(),
+						messages: roomMessages.messages
+					}, {method: 'html'});
 
 				messageBox.scrollTop(Number.MAX_VALUE);
 			}
