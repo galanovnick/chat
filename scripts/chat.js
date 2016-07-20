@@ -1,4 +1,8 @@
+//TODO: password check, wtf?
 var ChatApp = function(_rootId) {
+
+	$.Mustache.addFromDom('registration-template');
+	$.Mustache.addFromDom('login-template');
 
 	var _storage = new Storage();
 	var _eventBus = new EventBus();
@@ -20,7 +24,7 @@ var ChatApp = function(_rootId) {
 		_eventBus.subscribe(events.authenticationFailedEvent, _components.loginComponent.onUserAuthenticationFailed);
 		_eventBus.subscribe(events.successfulAuthenticationEvent, _components.loginComponent.onUserSuccessfullyAuthenticated);
 		_eventBus.subscribe(events.successfulAuthenticationEvent, _components.registrationComponent.onUserSuccessfullyAuthenticated);
-		_eventBus.subscribe(events.successfulAuthenticationEvent, _createUserBox);
+		_eventBus.subscribe(events.successfulAuthenticationEvent, _createUserMenu);
 
 		Object.keys(_components).forEach(function(key) {
 
@@ -28,46 +32,17 @@ var ChatApp = function(_rootId) {
 		});
 	}
 
-	var _createUserBox = function() {
-		_components.userBox = new UserBoxComponent("userBox");
+	var _createUserMenu = function() {
+		_components.userBox = new UserMenuComponent("userBox");
 		_components.userBox.init();
 	}
 
 	var RegistrationComponent = function(_componentRootId) {
 
 		var _init = function() {
-			$('<div>')
-				.html('Registration</br>')
-				.addClass('container')
-				.appendTo('#' + _rootId + " .login-reg")
-					.attr('id', _componentRootId)
-						.append($('<input/>')
-							.attr('type', 'text')
-							.attr('placeholder', 'Username')
-							.addClass('username'))
-							.append($('<br/>'))
-						.append($('<input/>')
-							.attr('type', 'password')
-							.attr('placeholder', 'Password')
-							.addClass('password'))
-							.append($('<br/>'))
-						.append($('<input/>')
-							.attr('type', 'password')
-							.attr('placeholder', 'Repeate password')
-							.addClass('password_r'))
-							.append($('<br/>'))
-						.append($('<input/>')
-							.attr('type', 'button')
-							.val('Register')
-							.addClass('register'))
-						.append($('<font>')
-							.append($('<br/>'))
-							.addClass('error')
-							.attr('color', 'red'))
-						.append($('<font>')
-							.append($('<br/>'))
-							.addClass('success')
-							.attr('color', 'light-blue'));
+			$('#' + _rootId + " .login-reg").append(
+				$.Mustache.render('registration-template', {id: _componentRootId})
+			);
 
 			$("#" + _componentRootId + " .register").click(function() {
 				var username = $("#" + _componentRootId + " .username").val();
@@ -123,30 +98,10 @@ var ChatApp = function(_rootId) {
 	var UserLoginComponent = function(_componentRootId) {
 
 		var _init = function() {
-			$('<div>')
-				.html('Login </br>')
-				.addClass('container')
-				.appendTo('#' + _rootId + " .login-reg")
-					.attr('id', _componentRootId)
-						.append($('<input/>')
-							.attr('type', 'text')
-							.attr('placeholder', 'Username')
-							.addClass('username'))
-							.append($('<br/>'))
-						.append($('<input/>')
-							.attr('type', 'password')
-							.attr('placeholder', 'Password')
-							.addClass('password'))
-							.append($('<br/>'))	
-						.append($('<input/>')
-							.attr('type', 'button')
-							.val('Login')
-							.addClass('login'))
-							.append($('<br/>'))
-						.append($('<font>')
-							.addClass('error')
-							.attr('color', 'red'));
 
+			$('#' + _rootId + " .login-reg").append(
+				$.Mustache.render('login-template', {id: _componentRootId})
+			);
 
 			$("#" + _componentRootId + " .login").click(function() {
 				var username = $("#" + _componentRootId + " .username").val();
@@ -181,7 +136,12 @@ var ChatApp = function(_rootId) {
 	}
 
 	
-	var UserBoxComponent = function(_componentRootId) {
+	var UserMenuComponent = function(_componentRootId) {
+
+		$.Mustache.addFromDom('user-menu-template');
+		$.Mustache.addFromDom('chat-room-template');
+		$.Mustache.addFromDom('add-message-template');
+		$.Mustache.addFromDom('message-list-template');
 
 		_chatService = new ChatService(_eventBus, _storage);
 
@@ -197,7 +157,10 @@ var ChatApp = function(_rootId) {
 			_eventBus.subscribe(events.failedRoomJoinEvent, _onRoomCreationFailed);
 			_eventBus.subscribe(events.leaveRommButtonClickedEvent, _chatService.onUserLeft);
 
-			_render();
+			$('#' + _rootId + " .main-content").append(
+				$.Mustache.render('user-menu-template', {id: _componentRootId, username: $("#u-name").val()})
+			);
+			showAvailableRooms();
 
 			$("#" + _componentRootId + " .new-room").click(function() {
 				_eventBus.post(new RoomDto($("#" + _componentRootId + " .room-name").val().replace(/ /g,"_")), events.createRoomButtonClickedEvent);
@@ -207,37 +170,6 @@ var ChatApp = function(_rootId) {
 				_eventBus.post({username: $("#u-name").val(), 
 					title: $("#" + _componentRootId + " .room-names").val().replace(/ /g,"_")}, events.joinRoomButtonClickedEvent);
 			});
-		}
-
-		var _render = function() {
-			$('<div></div>')
-				.appendTo("#" + _rootId + " .main-content")
-				.addClass('container user-box')
-				.attr("id", _componentRootId)
-					.append($('<font>')
-						.html('User: ' + $("#u-name").val()))
-					.append($('<input/>')
-						.attr('type', 'button')
-						.addClass('new-room')
-						.val('New chat'))
-					.append($('<input/>')
-						.attr('type', 'text')
-						.addClass('room-name')
-						.attr('placeholder', 'Chat name'))
-					.append($('<font>')
-						.html('Available chat rooms:')
-						.addClass('join-room-elem'))
-					.append($('<select>')
-						.addClass('room-names join-room-elem'))
-					.append($('<input/>')
-						.attr('type', 'button')
-						.addClass('join-room join-room-elem')
-						.val('Join chat'))
-						.append($('</br>'))
-					.append($('<font>')
-						.attr('color', 'red')
-						.addClass('error'));
-			showAvailableRooms();
 		}
 
 		var showAvailableRooms = function() {
@@ -310,17 +242,9 @@ var ChatApp = function(_rootId) {
 		}
 
 		var _render = function() {
-			$('<div>')
-				.html(_chatName)
-				.appendTo("#" + _rootId + " .main-content")
-				.addClass('container')
-				.attr('id', _componentRootId)
-					.append($('<input>')
-						.attr('type', 'button')
-						.addClass('leave-room')
-						.val('Leave chat'))
-					.append($('<div>')
-						.addClass('chat-room-content'));
+			$("#" + _rootId + " .main-content").append(
+				$.Mustache.render('chat-room-template', {id: _componentRootId, chatname: _chatName})
+			);
 
 			_chatRoomDomContent = $('#' + _componentRootId + ' .chat-room-content');
 
@@ -338,19 +262,10 @@ var ChatApp = function(_rootId) {
 		var AddMessageComponent = function() {
 
 			var _init = function() {
-				$('<textarea>')
-					.appendTo(_chatRoomDomContent)
-						.attr('placeholder', 'Type message here')
-						.addClass('message-input-box');
-				$('<input/>')
-					.appendTo(_chatRoomDomContent)
-						.attr('type', 'button')
-						.attr('value', 'Send message')
-						.addClass('send-message-btn');
-				$('<font>')
-					.appendTo(_chatRoomDomContent)
-						.attr('color', 'red')
-						.addClass('error');
+
+				_chatRoomDomContent.append(
+					$.Mustache.render('add-message-template')
+				);
 
 				$(_chatRoomDomContent).children(".send-message-btn").click(function() {
 					var message = new MessageDto($("#u-name").val(), $(_chatRoomDomContent).children(".message-input-box").val(), _componentRootId);
@@ -382,9 +297,9 @@ var ChatApp = function(_rootId) {
 		var MessageListComponent = function() {
 
 			var _init = function() {
-				$('<div></div>')
-					.appendTo(_chatRoomDomContent)
-					.addClass('container text-container messages');
+				_chatRoomDomContent.append(
+					$.Mustache.render('message-list-template')
+				);
 
 				_onMessageListUpdated({roomId: _componentRootId, messages: _chatService.getAllMessages(_componentRootId)});
 			}

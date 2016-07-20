@@ -1,3 +1,50 @@
+<script id="login-template" type="text/html">
+	<div class="container" id="{{id}}">
+		Login</br>
+		<input type="text" placeholder="Username" class="username"/></br>
+		<input type="password" placeholder="Password" class="password"/></br>
+		<input type="button" value="Login" class="login"/></br>
+		<font color="red" class="error" type="hidden"></font></br>
+	</div>
+</script>
+<script id="registration-template" type="text/html">
+	<div class="container" id="{{id}}">
+		Registration</br>
+		<input type="text" placeholder="Username" class="username"/></br>
+		<input type="password" placeholder="Password" class="password"/></br>
+		<input type="password" placeholder="Confirm password" class="password_r"/></br>
+		<input type="button" class="register" value="Register"/>
+		<font color="red" class="error" type="hidden"></font></br>
+		<font color="light-blue" class="success" type="hidden"></font></br>
+	</div>
+</script>
+<script id="user-menu-template" type="text/html">
+	<div class="container user-box" id="{{id}}">
+		<font>User: {{username}}</font>
+		<input type="text" class="room-name" placeholder="Chat name"/>
+		<input type="button" class="new-room" value="Create chat"/>
+		<font class="join-room-elem">Available chat rooms</font>
+		<select class="join-room-elem room-names"></select>
+		<input type="button" class="join-room-elem join-room" value="Join chat"/>
+		<font color="red" class="error"></font>
+	</div>
+</script>
+<script id="chat-room-template" type="text/html">
+	<div class="container" id="{{id}}">
+		{{chatname}}
+		<input type="button" class="leave-room" value="Leave chat"/>
+		<div class="chat-room-content"></div>
+	</div>
+</script>
+<script id="add-message-template" type="text/html">
+	<textarea placeholder="Type message here" class="message-input-box"></textarea>
+	<input type="button" class="send-message-btn" value="Send message"/>
+	<font class="error" color="red"></font>
+</script>
+<script id="message-list-template" type="text/html">
+	<div class="container text-container messages"></div>
+</script>
+<!-- tempaltes for mustache.js -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,6 +52,8 @@
 
 	<link rel="stylesheet" href="css/style.css">
 	<script src="scripts/lib/jquery.min.js"></script>
+	<script src="scripts/lib/jquery.mustache.js"></script>
+	<script src="scripts/lib/mustache.js"></script>
 	<script data-main="scripts/app" src="scripts/lib/require.js"></script>
 	
 </head>
@@ -13,7 +62,6 @@
 		<div class="col-1-4 login-reg">
 		</div>
 		<div class="col-3-4 main-content">
-			
 		</div>
 	</div>
 </body>
