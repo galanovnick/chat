@@ -1,4 +1,3 @@
-//TODO: password check, wtf?
 var ChatApp = function(_rootId) {
 
 	$.Mustache.addFromDom('registration-template');

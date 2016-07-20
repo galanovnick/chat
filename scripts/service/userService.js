@@ -15,7 +15,7 @@ var UserService = function(_userEventBus, _storage) {
 			console.log("Failed creation of user '" + user.username + "'. Reason: passwords do not match.");
 
 			_userEventBus.post("Passwords do not match.", events.registrationFailedEvent);
-		} else if (userExists(user)){
+		} else if (isUserExists(user)){
 			_userEventBus.post("User already exists.", events.registrationFailedEvent);
 		} else {
 			console.log("User(" + user.username + ") created.")
@@ -30,14 +30,14 @@ var UserService = function(_userEventBus, _storage) {
 		if (user.username === "" || user.password === "") {
 			_userEventBus.post("Fields cannot be empty.", events.authenticationFailedEvent);
 		} else {
-			if (userExists(user)) {
+			if (checkUserData(user)) {
 
 				_userEventBus.post(user.username, events.successfulAuthenticationEvent);
 
 				return;
 			}
 
-			_userEventBus.post("User does not exist.", events.authenticationFailedEvent);	
+			_userEventBus.post("Invalid username or password.", events.authenticationFailedEvent);	
 		}
 	}
 
@@ -49,16 +49,28 @@ var UserService = function(_userEventBus, _storage) {
 		return _authenticate(user);
 	}
 
-	var userExists = function(user) {
+	var isUserExists = function(user) {
 		var users = _storage.getItems("users");
-		var userExistsKey = false;
+		var isUserExistsKey = false;
 		users.forEach(function(item) {
 			if (item.username === user.username) {
-				userExistsKey = true;
+				isUserExistsKey = true;
 				return;
 			}
 		});
-		return userExistsKey;
+		return isUserExistsKey;
+	}
+
+	var checkUserData = function(user) {
+		var users = _storage.getItems("users");
+		var isUserDataCorrect = false;
+		users.forEach(function(item) {
+			if (item.username === user.username && item.password === user.password) {
+				isUserDataCorrect = true;
+				return;
+			}
+		});
+		return isUserDataCorrect;
 	}
 
 	var _getAll = function() {
