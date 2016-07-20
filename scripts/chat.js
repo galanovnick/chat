@@ -39,9 +39,8 @@ var ChatApp = function(_rootId) {
 	var RegistrationComponent = function(_componentRootId) {
 
 		var _init = function() {
-			$('#' + _rootId + " .login-reg").append(
-				$.Mustache.render('registration-template', {id: _componentRootId})
-			);
+
+			$('#' + _rootId + " .login-reg").mustache('registration-template', {id: _componentRootId});
 
 			$("#" + _componentRootId + " .register").click(function() {
 				var username = $("#" + _componentRootId + " .username").val();
@@ -98,9 +97,7 @@ var ChatApp = function(_rootId) {
 
 		var _init = function() {
 
-			$('#' + _rootId + " .login-reg").append(
-				$.Mustache.render('login-template', {id: _componentRootId})
-			);
+			$('#' + _rootId + " .login-reg").mustache('login-template', {id: _componentRootId})
 
 			$("#" + _componentRootId + " .login").click(function() {
 				var username = $("#" + _componentRootId + " .username").val();
@@ -133,7 +130,6 @@ var ChatApp = function(_rootId) {
 			"init": _init
 		}
 	}
-
 	
 	var UserMenuComponent = function(_componentRootId) {
 
@@ -156,9 +152,7 @@ var ChatApp = function(_rootId) {
 			_eventBus.subscribe(events.failedRoomJoinEvent, _onRoomCreationFailed);
 			_eventBus.subscribe(events.leaveRommButtonClickedEvent, _chatService.onUserLeft);
 
-			$('#' + _rootId + " .main-content").append(
-				$.Mustache.render('user-menu-template', {id: _componentRootId, username: $("#u-name").val()})
-			);
+			$('#' + _rootId + " .main-content").mustache('user-menu-template', {id: _componentRootId, username: $("#u-name").val()});
 			showAvailableRooms();
 
 			$("#" + _componentRootId + " .new-room").click(function() {
@@ -241,9 +235,7 @@ var ChatApp = function(_rootId) {
 		}
 
 		var _render = function() {
-			$("#" + _rootId + " .main-content").append(
-				$.Mustache.render('chat-room-template', {id: _componentRootId, chatname: _chatName})
-			);
+			$("#" + _rootId + " .main-content").mustache('chat-room-template', {id: _componentRootId, chatname: _chatName});
 
 			_chatRoomDomContent = $('#' + _componentRootId + ' .chat-room-content');
 
@@ -262,9 +254,7 @@ var ChatApp = function(_rootId) {
 
 			var _init = function() {
 
-				_chatRoomDomContent.append(
-					$.Mustache.render('add-message-template')
-				);
+				_chatRoomDomContent.mustache('add-message-template');
 
 				$(_chatRoomDomContent).children(".send-message-btn").click(function() {
 					var message = new MessageDto($("#u-name").val(), $(_chatRoomDomContent).children(".message-input-box").val(), _componentRootId);
@@ -296,9 +286,7 @@ var ChatApp = function(_rootId) {
 		var MessageListComponent = function() {
 
 			var _init = function() {
-				_chatRoomDomContent.append(
-					$.Mustache.render('message-list-template')
-				);
+				_chatRoomDomContent.mustache('message-list-template');
 
 				_onMessageListUpdated({roomId: _componentRootId, messages: _chatService.getAllMessages(_componentRootId)});
 			}
