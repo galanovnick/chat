@@ -1,3 +1,5 @@
+//TODO: bold, italic, href
+//TODO: ctrl+enter default button action
 var ChatApp = function(_rootId) {
 
 	$.Mustache.addFromDom('registration-template');
@@ -27,6 +29,13 @@ var ChatApp = function(_rootId) {
 
 		Object.keys(_components).forEach(function(key) {
 			_components[key].init();
+		});
+
+		$('body').on('keyup', '.txt-input', function(event) {
+			//event.preventDefault(); ? remove ?
+			if (event.ctrlKey && event.keyCode === 13) {
+				$(this).parent().children('.txt-input-btn').click();
+			}
 		});
 	}
 

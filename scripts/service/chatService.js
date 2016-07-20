@@ -16,8 +16,13 @@ var ChatService = function(_eventBus, _storage) {
 	}
 
 	var _createRoom = function(chatRoom) {
+		chatRoom.title = chatRoom.title.replace(/ +/g, ' ');
 		if (chatRoom.title === '') {
 			_eventBus.post("Chat name cannot be empty.", events.roomCreationFailedEvent);
+		} else if(chatRoom.title.indexOf(' ') === 0) {
+			_eventBus.post("Chat name cannot contains whitspace as first symbol.", events.roomCreationFailedEvent);
+		} else if(chatRoom.title.search(/[^a-z0-9 ]/i) !== -1) {
+			_eventBus.post("Chat name can contains only letters, digits and whitspaces.", events.roomCreationFailedEvent);
 		} else if(isChatExists(chatRoom.title)) {
 			_eventBus.post("Chat with such name already exists.", events.roomCreationFailedEvent);
 		} else {
@@ -38,7 +43,7 @@ var ChatService = function(_eventBus, _storage) {
 		} else if(isUserJoined(userRequestData.username, chatRoomTitle)) {
 			_eventBus.post("You cannot join chat room '" + chatRoomTitle + "' twice.", events.failedRoomJoinEvent);
 		} else {
-			_storage.addItem(randomIdChatPrefix + chatRoomTitle, userRequestData.username)
+			_storage.addItem(randomIdChatPrefix + chatRoomTitle, userRequestData.username);
 			_eventBus.post(chatRoomTitle, events.userSuccessfullyJoinedEvent);
 		}
 	}

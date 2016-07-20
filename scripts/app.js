@@ -20,7 +20,7 @@ define(function(require) {
 	require('./uiComponents/menu');
 	require('./uiComponents/chatRoom');
 	require('./chat');
-
+	
 	var chat = new ChatApp("chat-container").init();
 
 });		

@@ -24,12 +24,12 @@ var UserMenuComponent = function(_componentRootId, _rootId, _eventBus, _storage)
 		_render();
 
 		$("#" + _componentRootId + " .new-room").click(function() {
-			_eventBus.post(new RoomDto($("#" + _componentRootId + " .room-name").val().replace(/ /g,"_")), events.createRoomButtonClickedEvent);
+			_eventBus.post(new RoomDto($("#" + _componentRootId + " .room-name").val()), events.createRoomButtonClickedEvent);
 		});
 
 		$("#" + _componentRootId + " .join-room").click(function() {
 			_eventBus.post({username: $("#u-name").val(), 
-				title: $("#" + _componentRootId + " .room-names").val().replace(/ /g,"_")}, events.joinRoomButtonClickedEvent);
+				title: $("#" + _componentRootId + " .room-names").val()}, events.joinRoomButtonClickedEvent);
 		});
 	}
 
@@ -68,7 +68,6 @@ var UserMenuComponent = function(_componentRootId, _rootId, _eventBus, _storage)
 	}
 
 	var _onUserSuccessfullyJoined = function(roomTittle) {
-
 		var newRoom = new ChatRoomComponent(roomTittle, _rootId, _eventBus);
 		newRoom.init();
 
