@@ -4,7 +4,7 @@ var Storage = require('../scripts/storage/storage');
 var MessageDto = require('../scripts/dto/messageDto');
 var RoomDto = require('../scripts/dto/roomDto');
 
-describe("Chat service test-suite", function() {
+describe("Chat service test suite", function() {
 	var assertThat = require("unit.js");
 
 	it("Should create chat room", function() {
@@ -17,8 +17,8 @@ describe("Chat service test-suite", function() {
 
 		var chatService = new ChatService(eb, new Storage());
 
-		var firstRoom = new RoomDto("first-chat-room");
-		var secondRoom = new RoomDto("second-chat-room");
+		var firstRoom = new RoomDto("first chat room");
+		var secondRoom = new RoomDto("second chat room");
 
 		chatService.onRoomAdded(firstRoom);
 		chatService.onRoomAdded(secondRoom);
@@ -76,15 +76,15 @@ describe("Chat service test-suite", function() {
 
 		var chatService = new ChatService(eb, new Storage());
 
-		chatService.onRoomAdded(new RoomDto("chat-room"));
-		chatService.onRoomAdded(new RoomDto("chat-room"));
+		chatService.onRoomAdded(new RoomDto("chat room"));
+		chatService.onRoomAdded(new RoomDto("chat room"));
 
 		var allRooms = chatService.getAllRooms();
 
 		assertThat
 			.array(allRooms)
 				.hasLength(1)
-				.hasNotProperty(1, "chat-room")
+				.hasNotProperty(1, "chat room")
 		;
 		assertThat
 			.value(delivered)
@@ -101,16 +101,16 @@ describe("Chat service test-suite", function() {
 		});
 
 		var chatService = new ChatService(eb, new Storage());
-		chatService.onRoomAdded(new RoomDto("room-id"));
-		chatService.onUserJoined({username: "Vasya", title: "room-id"});
+		chatService.onRoomAdded(new RoomDto("room id"));
+		chatService.onUserJoined({username: "Vasya", title: "room id"});
 
-		var message1 = new MessageDto("Vasya", "Hello world!", "room-id");
-		var message2 = new MessageDto("Vasya", "banana", "room-id");
+		var message1 = new MessageDto("Vasya", "Hello world!", "room id");
+		var message2 = new MessageDto("Vasya", "banana", "room id");
 
 		chatService.onMessageAdded(message1);
 		chatService.onMessageAdded(message2);
 
-		var allmessages = chatService.getAllMessages("room-id");
+		var allmessages = chatService.getAllMessages("room id");
 
 		assertThat
 			.array(allmessages)
@@ -123,8 +123,8 @@ describe("Chat service test-suite", function() {
 		assertThat
 			.array(delivered)
 				.hasLength(2)
-				.hasProperty(0, "room-id")
-				.hasProperty(1, "room-id")
+				.hasProperty(0, "room id")
+				.hasProperty(1, "room id")
 		;
 	});
 
@@ -137,13 +137,13 @@ describe("Chat service test-suite", function() {
 		});
 
 		var chatService = new ChatService(eb, new Storage());
-		chatService.onRoomAdded("room-id");
+		chatService.onRoomAdded(new RoomDto("room id"));
 
-		var message = new MessageDto("Vasya", "Hello world!", "room-id");
+		var message = new MessageDto("Vasya", "Hello world!", "room id");
 
 		chatService.onMessageAdded(message);
 
-		var allmessages = chatService.getAllMessages("room-id");
+		var allmessages = chatService.getAllMessages("room id");
 
 		assertThat
 			.array(allmessages)
@@ -165,18 +165,18 @@ describe("Chat service test-suite", function() {
 		});
 
 		var chatService = new ChatService(eb, new Storage());
-		chatService.onRoomAdded("room-id");
-		chatService.onUserJoined({username: "Vasya", title: "room-id"});
+		chatService.onRoomAdded(new RoomDto("room id"));
+		chatService.onUserJoined({username: "Vasya", title: "room id"});
 
-		var emptyMessage1 = new MessageDto("Vasya", "", "room-id");
+		var emptyMessage1 = new MessageDto("Vasya", "", "room id");
 		var emptyMessage2 = new MessageDto("Vasya");
-		var emptyMessage3 = new MessageDto("Vasya", null, "room-id");
+		var emptyMessage3 = new MessageDto("Vasya", null, "room id");
 
 		chatService.onMessageAdded(emptyMessage1);
 		chatService.onMessageAdded(emptyMessage2);
 		chatService.onMessageAdded(emptyMessage3);
 
-		var allmessages = chatService.getAllMessages("room-id");
+		var allmessages = chatService.getAllMessages("room id");
 
 		assertThat
 			.array(allmessages)

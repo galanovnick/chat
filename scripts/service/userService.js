@@ -11,6 +11,8 @@ var UserService = function(_userEventBus, _storage) {
 			console.log("Failed creation of user '" + user.username + "'. Reason: empty input fields.");
 
 			_userEventBus.post("Fields cannot be empty.", events.registrationFailedEvent);
+		} else if(user.username.search(/[^a-z0-9]/i) !== -1) {
+			_userEventBus.post("Username can contain only letters and digits.", events.registrationFailedEvent);
 		} else if(user.password !== user.password_r) {
 			console.log("Failed creation of user '" + user.username + "'. Reason: passwords do not match.");
 

@@ -20,9 +20,9 @@ var ChatService = function(_eventBus, _storage) {
 		if (chatRoom.title === '') {
 			_eventBus.post("Chat name cannot be empty.", events.roomCreationFailedEvent);
 		} else if(chatRoom.title.indexOf(' ') === 0) {
-			_eventBus.post("Chat name cannot contains whitspace as first symbol.", events.roomCreationFailedEvent);
+			_eventBus.post("Chat name cannot contain whitspace as first symbol.", events.roomCreationFailedEvent);
 		} else if(chatRoom.title.search(/[^a-z0-9 ]/i) !== -1) {
-			_eventBus.post("Chat name can contains only letters, digits and whitspaces.", events.roomCreationFailedEvent);
+			_eventBus.post("Chat name can contain only letters, digits and whitspaces.", events.roomCreationFailedEvent);
 		} else if(isChatExists(chatRoom.title)) {
 			_eventBus.post("Chat with such name already exists.", events.roomCreationFailedEvent);
 		} else {
